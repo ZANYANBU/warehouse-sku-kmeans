@@ -26,7 +26,7 @@ const S = pres.ShapeType;
 const HEX = THEME.colors;
 
 const FOOT = "Warehouse SKU clustering  |  Project Review 3";
-const ELBOW = [1532.0, 1025.2, 772.5, 600.1, 511.0, 453.9, 410.9, 368.2];   // within-cluster variance, k = 1..8, real data
+const ELBOW = [1532.0, 1025.2, 772.5, 600.1, 511.0, 453.9, 412.4, 368.2];   // within-cluster variance, k = 1..8, real data
 
 // ---- layouts ---------------------------------------------------------------
 const dot = (x, y, d, color) => ({ text: { text: "", options: { shape: S.ellipse, x, y, w: d, h: d, fill: { color }, line: { color } } } });
