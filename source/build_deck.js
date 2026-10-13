@@ -26,6 +26,17 @@ const S = pres.ShapeType;
 const HEX = THEME.colors;
 
 const FOOT = "Warehouse SKU clustering  |  Project Review 3";
+const G = require(__dirname + "/graphs.json");      // month-by-month figures and silhouette scores, from the notebook's run
+const PTS = require(__dirname + "/points.json");    // every SKU in the two-dimensional (PCA) picture
+// One colour for each cluster, the same four as in the notebook's graphs.
+const ZC = { A: "2A78D6", B: "EDA100", C: "E87BA4", D: "008300" };
+const ZFG = { A: "FFFFFF", B: "16212B", C: "16212B", D: "FFFFFF" };
+const ZNAME = { A: "Fast movers", B: "Bulky / heavy", C: "Seasonal", D: "Regular small items" };
+const axes = (extra = {}) => ({
+  catAxisLabelColor: "5F7180", valAxisLabelColor: "5F7180", catAxisLabelFontSize: 11, valAxisLabelFontSize: 11,
+  catAxisLabelFontFace: "+mn-lt", valAxisLabelFontFace: "+mn-lt", titleFontFace: "+mn-lt", dataLabelFontFace: "+mn-lt",
+  valGridLine: { color: "EAF2F3", size: 0.75 }, catGridLine: { style: "none" }, showLegend: false, ...extra,
+});
 const ELBOW = [1532.0, 1025.2, 772.5, 600.1, 511.0, 453.9, 412.4, 368.2];   // within-cluster variance, k = 1..8, real data
 
 // ---- layouts ---------------------------------------------------------------
@@ -85,6 +96,14 @@ const cluster = (slide, cx, cy, color, d = 0.2, ring = C.background1, k = 1) => 
   }
   const r = 0.26 * Math.max(k, 0.7);
   slide.addShape(S.ellipse, { x: cx - r / 2, y: cy - r / 2, w: r, h: r, fill: { color: ring }, line: { color, width: 2.5 * Math.max(k, 0.7) }, objectName: name("Centroid") });
+};
+
+const legendRow = (slide, x, y, w) => {
+  const each = w / 4;
+  "ABCD".split("").forEach((z, i) => {
+    slide.addShape(S.ellipse, { x: x + i * each, y: y + 0.06, w: 0.18, h: 0.18, fill: { color: ZC[z] }, line: { color: ZC[z], width: 0 }, objectName: name("Key") });
+    text(slide, `${z}  ${ZNAME[z]}`, { x: x + i * each + 0.26, y, w: each - 0.3, h: 0.3, fontSize: 12, valign: "middle" });
+  });
 };
 
 // ---- 1. Title --------------------------------------------------------------
@@ -296,6 +315,24 @@ pres.addSection({ title: "Applying K-Means" });
   });
 }
 
+// ---- The real data at a glance -----------------------------------------------
+{
+  const s = content("Applying K-Means", "The real data at a glance",
+    "This graph shows the real orders in each month. The dataset has 99,441 orders for 32,951 products. Orders grow through 2017, and November 2017, the Black Friday month, is the highest. From all these products we kept the 383 that were ordered at least 30 times.");
+  const stats = [["99,441", "real orders, 2016 to 2018"], ["32,951", "products in the dataset"], ["383", "SKUs ordered 30 times or more"]];
+  stats.forEach(([v, l], i) => {
+    const x = 0.5 + i * 3.07;
+    card(s, x, 1.3, 2.87, 0.95);
+    text(s, v, { x: x + 0.2, y: 1.36, w: 2.5, h: 0.5, fontSize: 26, bold: true, color: C.text2, valign: "middle" });
+    text(s, l, { x: x + 0.2, y: 1.84, w: 2.5, h: 0.32, fontSize: 12, color: C.accent5, valign: "middle" });
+  });
+  s.addChart(pres.charts.BAR, [{ name: "Orders", labels: G.months_all, values: G.orders_all }], axes({
+    x: 0.5, y: 2.4, w: 9.0, h: 2.6, barDir: "col", chartColors: ["2A78D6"], barGapWidthPct: 40,
+    showTitle: true, title: "Orders placed in each month", titleFontSize: 12, titleColor: "0F4C5C",
+    catAxisLabelFontSize: 9, catAxisLabelRotate: 270, valAxisLabelFormatCode: "#,##0", objectName: "Orders by month",
+  }));
+}
+
 // ---- 9. Choose k -----------------------------------------------------------
 {
   const s = content("Applying K-Means", "Step 2: Choose the value of k",
@@ -326,6 +363,32 @@ pres.addSection({ title: "Applying K-Means" });
   s.addText("On the real data: k = 4", { shape: S.roundRect, rectRadius: 0.15, x: 6.0, y: 4.42, w: 3.5, h: 0.43, fill: { color: C.accent2 }, line: { color: C.accent2, width: 0 }, color: C.text1, bold: true, fontSize: 15, align: "center", valign: "middle", margin: 0, objectName: name("Pill") });
 }
 
+// ---- A second check: the silhouette score -------------------------------------
+{
+  const s = content("Applying K-Means", "A second check: silhouette",
+    "The elbow gave k equal to 4. We checked it a second way with the silhouette score. It tells how well each SKU sits inside its own group, and higher is better. The score is highest at k equal to 4, at 0.37. So both checks agree, and we use 4 clusters.");
+  const ks = Object.keys(G.silhouette);
+  s.addChart(pres.charts.BAR, [{ name: "Silhouette score", labels: ks, values: ks.map((k) => G.silhouette[k]) }], axes({
+    x: 0.5, y: 1.3, w: 5.2, h: 3.55, barDir: "col", chartColors: ks.map((k) => (k === "4" ? "EDA100" : "9BBBE4")), barGapWidthPct: 45,
+    showTitle: true, title: "Silhouette score for each k (real data)", titleFontSize: 12, titleColor: "0F4C5C",
+    showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: "0.00", dataLabelFontSize: 11, dataLabelColor: "16212B",
+    showCatAxisTitle: true, catAxisTitle: "Number of clusters (k)", catAxisTitleFontSize: 11, catAxisTitleColor: "5F7180", catAxisTitleFontFace: "+mn-lt",
+    valAxisMinVal: 0, valAxisMaxVal: 0.45, valAxisLabelFormatCode: "0.00", objectName: "Silhouette chart",
+  }));
+  const pts = [
+    ["What it measures", "How well each SKU sits inside its own group. Higher is better."],
+    ["Highest at k = 4", "The score is 0.37 at k = 4, above every other k."],
+    ["Both checks agree", "The elbow and the silhouette both point to 4 clusters."],
+  ];
+  pts.forEach(([t, d], i) => {
+    const y = 1.3 + i * 1.03;
+    badge(s, i + 1, 6.0, y, 0.4);
+    text(s, t, { x: 6.52, y, w: 2.98, h: 0.34, bold: true, fontSize: 15, color: C.text2, valign: "middle" });
+    text(s, d, { x: 6.52, y: y + 0.36, w: 2.98, h: 0.62 });
+  });
+  s.addText("Both checks: k = 4", { shape: S.roundRect, rectRadius: 0.15, x: 6.0, y: 4.42, w: 3.5, h: 0.43, fill: { color: C.accent2 }, line: { color: C.accent2, width: 0 }, color: C.text1, bold: true, fontSize: 15, align: "center", valign: "middle", margin: 0, objectName: name("Pill") });
+}
+
 // ---- 10. Clusters become zones ---------------------------------------------
 {
   const s = content("Applying K-Means", "Step 3: Clusters become zones",
@@ -347,10 +410,10 @@ pres.addSection({ title: "Applying K-Means" });
   card(s, 6.4, 1.3, 3.1, 3.55);
   text(s, "Floor plan", { x: 6.55, y: 1.38, w: 2.8, h: 0.28, fontSize: 11, bold: true, color: C.text2, valign: "middle" });
   const zones = [
-    [6.55, 1.72, "C", "Seasonal", C.accent4, C.text1],
-    [8.05, 1.72, "D", "Regular small", C.accent5, C.background1],
-    [6.55, 2.92, "A", "Fast movers", C.accent2, C.text1],
-    [8.05, 2.92, "B", "Bulky / heavy", C.accent6, C.background1],
+    [6.55, 1.72, "C", "Seasonal", ZC.C, ZFG.C],
+    [8.05, 1.72, "D", "Regular small", ZC.D, ZFG.D],
+    [6.55, 2.92, "A", "Fast movers", ZC.A, ZFG.A],
+    [8.05, 2.92, "B", "Bulky / heavy", ZC.B, ZFG.B],
   ];
   zones.forEach(([x, y, num, label, fill, fg]) => {
     s.addText([
@@ -359,6 +422,86 @@ pres.addSection({ title: "Applying K-Means" });
     ], { shape: S.roundRect, rectRadius: 0.06, x, y, w: 1.3, h: 1.05, fill: { color: fill }, line: { color: fill, width: 0 }, color: fg, align: "center", valign: "middle", margin: 0.04, objectName: name("Zone") });
   });
   s.addText("Packing and dispatch", { shape: S.roundRect, rectRadius: 0.06, x: 6.55, y: 4.15, w: 2.8, h: 0.5, fill: { color: C.accent1 }, line: { color: C.accent1, width: 0 }, color: C.background1, bold: true, fontSize: 13, align: "center", valign: "middle", margin: 0, objectName: name("Packing") });
+}
+
+// ---- The four clusters in one picture -----------------------------------------
+{
+  const s = content("Applying K-Means", "The four clusters in one picture",
+    "Every dot is one real SKU, and its colour is its cluster. A SKU has four numbers, so we cannot draw it directly. PCA, which is also in Unit 3, squeezes the four numbers into two, and keeps 76 percent of the variation. Dots of the same colour sit together, which means similar products landed in the same cluster. The letters mark the cluster centres.");
+  const box = { x: 0.5, y: 1.3, w: 5.6, h: 3.2 };
+  s.addShape(S.rect, { x: box.x, y: box.y, w: box.w, h: box.h, fill: { color: C.background1 }, line: { color: "D5DEE2", width: 0.75 }, objectName: "Plot area" });
+  const xs = PTS.points.map((q) => q[0]), ys = PTS.points.map((q) => q[1]), pad = 0.35;
+  const x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+  const px = (v) => box.x + ((v - x0) / (x1 - x0)) * box.w, py = (v) => box.y + box.h - ((v - y0) / (y1 - y0)) * box.h;
+  const d = 0.085;
+  for (const [a, b, z] of PTS.points) {
+    s.addShape(S.ellipse, { x: px(a) - d / 2, y: py(b) - d / 2, w: d, h: d, fill: { color: ZC[z], transparency: 12 }, line: { color: "FFFFFF", width: 0.25 }, objectName: name("SKU") });
+  }
+  for (const [a, b, z] of PTS.centres) {
+    s.addText(z, { shape: S.ellipse, x: px(a) - 0.17, y: py(b) - 0.17, w: 0.34, h: 0.34, fill: { color: "FFFFFF" }, line: { color: "16212B", width: 2 }, color: "16212B", bold: true, fontSize: 12, align: "center", valign: "middle", margin: 0, objectName: name("Centre") });
+  }
+  legendRow(s, 0.5, 4.6, 9.0);
+  const pts = [
+    ["Each dot is one SKU", "383 real products, coloured by their cluster."],
+    ["Drawn with PCA", `Four numbers squeezed into two. It keeps ${PTS.kept_pct}% of the variation.`],
+    ["Same colour, same place", "Similar products landed in the same cluster."],
+  ];
+  pts.forEach(([t, dsc], i) => {
+    const y = 1.3 + i * 1.12;
+    badge(s, i + 1, 6.4, y, 0.4);
+    text(s, t, { x: 6.92, y, w: 2.58, h: 0.34, bold: true, fontSize: 15, color: C.text2, valign: "middle" });
+    text(s, dsc, { x: 6.92, y: y + 0.36, w: 2.58, h: 0.66 });
+  });
+}
+
+// ---- What each cluster looks like ---------------------------------------------
+{
+  const s = content("Applying K-Means", "What each cluster looks like",
+    "These four graphs show the average of each number for each cluster. Cluster A is ordered the most, about 160 times. Cluster B is the biggest and the heaviest. Cluster C has the highest season index. Cluster D is small and steady. This is how we gave the clusters their names.");
+  const charts = [
+    ["Average orders", [160, 52, 48, 45], "0"],
+    ["Season index", [2.6, 3.5, 7.4, 3.2], "0.0"],
+    ["Average volume (L)", [9.2, 47.1, 12.9, 5.1], "0.0"],
+    ["Average weight (kg)", [1.1, 7.6, 1.1, 0.6], "0.0"],
+  ];
+  charts.forEach(([title, values, fmtCode], i) => {
+    s.addChart(pres.charts.BAR, [{ name: title, labels: ["A", "B", "C", "D"], values }], axes({
+      x: 0.5 + i * 2.27, y: 1.3, w: 2.2, h: 2.75, barDir: "col", chartColors: [ZC.A, ZC.B, ZC.C, ZC.D], barGapWidthPct: 45,
+      showTitle: true, title, titleFontSize: 12, titleColor: "0F4C5C",
+      showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: fmtCode, dataLabelFontSize: 11, dataLabelColor: "16212B",
+      valAxisHidden: true, valAxisMinVal: 0, valGridLine: { style: "none" }, objectName: title,
+    }));
+  });
+  legendRow(s, 0.5, 4.12, 9.0);
+  card(s, 0.5, 4.5, 9.0, 0.45);
+  text(s, "A is picked the most. B is the biggest and heaviest. C sells in one season. D is small and steady.",
+    { x: 0.7, y: 4.5, w: 8.6, h: 0.45, valign: "middle" });
+}
+
+// ---- A seasonal product against a fast mover ------------------------------------
+{
+  const s = content("Applying K-Means", "Seasonal against fast mover",
+    "Here are two real products, month by month. The pink line is the most ordered SKU of the seasonal cluster. Of its 114 orders, 76 came in one month, January 2018. The blue line is the most ordered fast mover. It has 527 orders, spread over many months. That is the difference between the two clusters.");
+  s.addChart(pres.charts.LINE, [
+    { name: "Seasonal SKU (114 orders)", labels: G.months, values: G.seasonal },
+    { name: "Fast mover (527 orders)", labels: G.months, values: G.fast },
+  ], axes({
+    x: 0.5, y: 1.3, w: 6.0, h: 3.55, chartColors: [ZC.C, ZC.A], lineSize: 3, lineDataSymbol: "circle", lineDataSymbolSize: 7,
+    showTitle: true, title: "Orders in each month, two real SKUs", titleFontSize: 12, titleColor: "0F4C5C",
+    showLegend: true, legendPos: "b", legendFontSize: 11, legendFontFace: "+mn-lt", legendColor: "16212B",
+    catAxisLabelFontSize: 9, catAxisLabelRotate: 270, valAxisMinVal: 0, objectName: "Seasonal against fast mover",
+  }));
+  const pts = [
+    ["Seasonal SKU", "76 of its 114 orders came in a single month, January 2018."],
+    ["Fast mover", "527 orders, with 40 or more in seven different months."],
+    ["Why it matters", "A seasonal product needs a front place only in its season."],
+  ];
+  pts.forEach(([t, dsc], i) => {
+    const y = 1.3 + i * 1.17;
+    badge(s, i + 1, 6.8, y, 0.4, i === 0 ? C.accent6 : C.accent2);
+    text(s, t, { x: 7.32, y, w: 2.18, h: 0.34, bold: true, fontSize: 15, color: C.text2, valign: "middle" });
+    text(s, dsc, { x: 7.32, y: y + 0.36, w: 2.18, h: 0.78 });
+  });
 }
 
 // ---- 11. How this solves the problem ---------------------------------------
@@ -383,6 +526,30 @@ pres.addSection({ title: "Conclusion" });
     { text: "How we check the clusters: ", options: { bold: true, color: C.text2 } },
     { text: "each centroid should read like a typical product. Fast movers: about 160 orders, 9 litres, 1 kg. The walking figure is a model, not a measurement." },
   ], { x: 0.7, y: 3.92, w: 8.6, h: 0.9, valign: "middle" });
+}
+
+// ---- The aisle and the walk per pick ------------------------------------------
+{
+  const s = content("Conclusion", "The aisle and the walk per pick",
+    "The strip on top is one aisle of 128 metres, starting at the packing desk. Each cluster takes as much of the aisle as it has products, and the most ordered cluster, A, comes first. The bars below show the walk for each pick in this simple model. With no grouping it is about 64 metres. With the K-Means zones it is about 47 metres, which is 27 percent less. This is a model, not a measurement.");
+  text(s, "One aisle of 128 m, from the packing desk", { x: 0.5, y: 1.25, w: 9, h: 0.3, bold: true, fontSize: 14, color: C.text2, valign: "middle" });
+  const zones = [["A", 0, 25.3, "76 SKUs"], ["B", 25.3, 53.3, "84 SKUs"], ["C", 53.3, 61.7, "25"], ["D", 61.7, 127.7, "198 SKUs"]];
+  zones.forEach(([z, from, to, label]) => {
+    const x = 0.5 + (from / 127.7) * 9.0, w = ((to - from) / 127.7) * 9.0;
+    s.addText([{ text: z, options: { bold: true, fontSize: 16, breakLine: true } }, { text: label, options: { fontSize: 11 } }],
+      { shape: S.rect, x, y: 1.62, w: w - 0.03, h: 0.8, fill: { color: ZC[z] }, line: { color: "FFFFFF", width: 1 }, color: ZFG[z], align: "center", valign: "middle", margin: 0, objectName: name("Zone") });
+  });
+  legendRow(s, 0.5, 2.5, 9.0);
+  s.addChart(pres.charts.BAR, [{ name: "Walk per pick (m)", labels: ["K-Means zones", "No grouping"], values: [46.5, 63.8] }], axes({
+    x: 0.5, y: 2.95, w: 5.9, h: 1.95, barDir: "bar", chartColors: ["008300", "9BBBE4"], barGapWidthPct: 45,
+    showTitle: true, title: "Walk per pick in the model (metres)", titleFontSize: 12, titleColor: "0F4C5C",
+    showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: '0.0" m"', dataLabelFontSize: 12, dataLabelColor: "16212B",
+    valAxisMinVal: 0, valAxisMaxVal: 80, valAxisLabelFormatCode: "0", objectName: "Walk per pick",
+  }));
+  card(s, 6.7, 2.95, 2.8, 1.95, C.accent1);
+  text(s, "27%", { x: 6.7, y: 3.05, w: 2.8, h: 0.85, fontSize: 44, bold: true, color: C.background1, align: "center", valign: "middle" });
+  text(s, "less walking per pick", { x: 6.7, y: 3.88, w: 2.8, h: 0.35, fontSize: 14, color: C.background1, align: "center", valign: "middle" });
+  text(s, "A simple model, not a measurement", { x: 6.7, y: 4.3, w: 2.8, h: 0.35, fontSize: 11, color: C.background2, align: "center", valign: "middle" });
 }
 
 // ---- 12. Conclusion --------------------------------------------------------

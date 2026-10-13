@@ -49,13 +49,13 @@ Everything runs in the browser from one file, `index.html`. There is nothing to 
 | Path | What it is |
 |---|---|
 | `index.html` | The live demo (plain HTML, CSS and JavaScript) |
-| `slides/kmeans-sku-clustering.pptx` | The 12-slide presentation |
-| `script/presentation-script.pdf` | The presentation script: 4 speakers, 3 slides each, with simple examples and terms |
+| `slides/kmeans-sku-clustering.pptx` | The 18-slide presentation, with the graphs from the notebook |
+| `script/presentation-script.pdf` | The presentation script: one page for each slide, with simple examples and terms |
 | `notebook/warehouse_sku_kmeans.ipynb` | The Colab notebook: live data, features, elbow, K-Means, zones, with ten graphs |
 | `data/SOURCE.md` | Where the data comes from, which files are read and how each number is built |
 | `data/sku_features.csv` | The 383 real SKUs with their four numbers and cluster |
 | `data/results.json` | The real-data results the page shows |
-| `source/build_deck.js` | The script that generated the slides (needs `pptxgenjs`) |
+| `source/build_deck.js` | The script that generated the slides (needs `pptxgenjs`; reads `points.json` and `graphs.json` beside it) |
 | `source/make_notebook.py` | The script that writes the notebook |
 | `source/build_script.py` | The script that generated the presentation script (needs `reportlab`) |
 

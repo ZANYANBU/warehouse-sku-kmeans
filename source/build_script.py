@@ -58,20 +58,31 @@ CELL_B = st("cell_b", fontName="Body-Bold", fontSize=10.5, leading=14)
 CELL_H = st("cell_h", fontName="Body-Bold", fontSize=10.5, leading=14, textColor=WHITE)
 
 SPEAKERS = [
-    ("V. Anbu Chelvan", ORANGE),
-    ("S Roopesh", GREEN),
-    ("B. Charith Reddy", SLATE),
-    ("Y Rupesh Reddy", ROSE),
+    ("S Roopesh", ORANGE),
+    ("B. Charith Reddy", GREEN),
+    ("Y Rupesh Reddy", SLATE),
+    ("V. Anbu Chelvan", ROSE),
 ]
+SPLIT = [5, 5, 5, 3]          # how many slides each speaker takes, in order
+
+
+def speaker_of(i):
+    """Which speaker (1-based) has slide index ``i`` (0-based)."""
+    upto = 0
+    for n, count in enumerate(SPLIT):
+        upto += count
+        if i < upto:
+            return n + 1
+    return len(SPLIT)
 
 # One entry per slide: title, what to say, a simple example, terms, and one likely question.
 SLIDES = [
     dict(
         title="Title slide",
         say=[
-            "Good morning everyone. We are team <b>Cash guard</b>. I am Anbu Chelvan, and my teammates are Roopesh, Charith Reddy and Rupesh Reddy.",
+            "Good morning everyone. We are team <b>Cash guard</b>. I am Roopesh, and my teammates are Charith Reddy, Rupesh Reddy and Anbu Chelvan.",
             "This is our Project Review 3 for Machine Learning, 21CSC305P. Our topic is <b>grouping warehouse products with K-Means clustering</b>.",
-            "We studied the solutions given in Unit 3 and selected K-Means for our problem. I will explain the problem and the basic terms. Roopesh will explain why we chose K-Means. Charith will show how it works on our data. Rupesh will show the result and conclude.",
+            "We studied the solutions given in Unit 3 and selected K-Means for our problem. I will explain the problem and the solution we chose. Charith will show how K-Means works on real data. Rupesh will show the clusters. Anbu will show how it solves the problem and conclude.",
         ],
         example="Think of a supermarket. Milk and bread are kept where everyone can reach them quickly. We want a warehouse to place its products in the same smart way.",
         terms=[("K-Means clustering", "A method that divides data into k groups of similar items."),
@@ -98,7 +109,7 @@ SLIDES = [
             "Before the solution, six simple terms. <b>SKU</b> is one unique product type. A 1 litre water bottle is one SKU and a 500 ml bottle is another SKU.",
             "<b>Pick frequency</b> is how many times a product is taken from the shelf. <b>Seasonal demand velocity</b> is how fast it sells in a season: umbrellas in the monsoon, sweaters in winter.",
             "<b>Clustering</b> means dividing data into groups where the items in a group are very similar. The <b>centroid</b> is the centre, or average point, of a cluster. <b>Unsupervised learning</b> means the data has no labels, so the algorithm finds the groups by itself.",
-            "Now Roopesh will explain the solutions we reviewed.",
+            "Next, the solutions we reviewed.",
         ],
         example="Clustering is like sorting a basket of mixed fruits. Nobody gives us the names, but we still put apples with apples and oranges with oranges because they look alike.",
         terms=[("Feature", "A measurable property, such as size or pick frequency."),
@@ -110,7 +121,7 @@ SLIDES = [
     dict(
         title="Unit 3 solutions we reviewed",
         say=[
-            "Thank you, Anbu. Unit 3 gives us four kinds of solutions.",
+            "Unit 3 gives us four kinds of solutions.",
             "First, <b>K-Means clustering</b>. It splits the data into k groups, and each item joins the nearest centre. Second, <b>Mixtures of Gaussians</b> with the EM algorithm. This is soft clustering: each item gets a probability for every group.",
             "Third, <b>hierarchical clustering</b>. It builds a tree of clusters, called a dendrogram, by merging or splitting step by step. Fourth, <b>PCA and factor analysis</b>. These reduce many features to a few, but they do not make groups.",
             "We compared all four with our problem and selected K-Means.",
@@ -129,6 +140,7 @@ SLIDES = [
             "Our selected solution is K-Means. <b>K-Means groups similar data points into k clusters without needing labelled data.</b> Here k is simply the number of groups we want.",
             "Why does it suit our project? Reason one: our problem statement says partition, and K-Means is a partitioning method. Reason two: every SKU gets exactly one group, just as a product is kept in one storage zone.",
             "Reason three: all four inputs can be written as numbers, so the algorithm can measure the distance between products. Reason four: it is simple and fast even for thousands of SKUs, and we can run it again every season.",
+            "Now Charith will explain why we did not pick the other methods.",
         ],
         example="If k is 3, K-Means makes 3 groups. It is like dividing a class into 3 teams so that students with similar marks are in the same team.",
         terms=[("k", "The number of clusters we ask for."),
@@ -140,10 +152,10 @@ SLIDES = [
     dict(
         title="Why not the other solutions",
         say=[
-            "You may ask why we did not choose the other methods.",
+            "Thank you, Roopesh. You may ask why we did not choose the other methods.",
             "<b>Mixtures of Gaussians</b> give a probability for every group. But a product cannot be kept 60% in one zone and 40% in another. We need one clear zone.",
             "<b>Hierarchical clustering</b> compares every pair of items, so it becomes slow for thousands of SKUs. <b>PCA and factor analysis</b> do not create groups at all. They can only help before clustering.",
-            "<b>K-Means</b> gives k clear groups with one centre each. That is exactly what we need. Now Charith will explain how K-Means works.",
+            "<b>K-Means</b> gives k clear groups with one centre each. That is exactly what we need. Next, how K-Means works.",
         ],
         example="With 1,000 SKUs there are about 5 lakh pairs to compare (1,000 x 999 / 2 = 4,99,500). K-Means only compares each SKU with the k centres, for example 1,000 x 4 = 4,000 distances in one round.",
         terms=[("Probability", "A number from 0 to 1 that says how likely something is."),
@@ -155,7 +167,7 @@ SLIDES = [
     dict(
         title="How K-Means works",
         say=[
-            "Thank you, Roopesh. K-Means works in five steps.",
+            "K-Means works in five steps.",
             "Step one: choose k centroids at random. Step two: measure the distance from each SKU to every centroid. Step three: assign each SKU to the nearest centroid.",
             "Step four: move each centroid to the mean, that is the average, of the SKUs in its cluster. Step five: repeat steps two to four until no SKU changes its cluster.",
             "The distance we use is <b>Euclidean distance</b>, which is the straight-line distance between two points.",
@@ -183,12 +195,25 @@ SLIDES = [
         ask=("Where did the data come from?", "From Olist's public dataset on GitHub: github.com/olist/work-at-olist-data. Our Colab notebook reads it live from that link."),
     ),
     dict(
+        title="The real data at a glance",
+        say=[
+            "Before clustering, let us look at the real data. The dataset has 99,441 orders for 32,951 products, placed from 2016 to 2018.",
+            "The graph shows the orders in each month. Orders grow through 2017. The tallest bar is November 2017, the Black Friday month.",
+            "From all these products we kept the 383 that were ordered at least 30 times. With fewer orders, we cannot say whether a product is seasonal or not.",
+        ],
+        example="It is like judging a batsman. After 2 matches you cannot say much. After 30 matches you can see his pattern.",
+        terms=[("Order line", "One product inside one order."),
+               ("Black Friday", "A big sale day in November, when orders jump."),
+               ("Filter", "Keeping only the rows that meet a rule: here, 30 orders or more.")],
+        ask=("Why only 383 out of 32,951 products?", "Most products were ordered only a few times. With so few orders the seasonal number is not reliable, so we kept the products with 30 or more."),
+    ),
+    dict(
         title="Step 2: Choose the value of k",
         say=[
             "K-Means needs the value of k before it starts. We use the <b>elbow method</b> from Unit 3, on the real data.",
             "We ran K-Means for k equal to 1 up to 8 and noted the error each time. The error is the within-cluster variance: how far the SKUs are from their own centroid.",
             "The error falls by 33 percent, then 25, then 22 percent as we go to k equal to 4. After that it falls only 15 percent. So the curve bends at 4.",
-            "That is why we use 4 clusters. Now Rupesh will show the result.",
+            "So the elbow says 4 clusters. Now Rupesh will show a second check.",
         ],
         example="A shop adds billing counters. Going from 1 counter to 4 makes the queue much shorter. Going from 4 to 8 helps only a little. The useful stopping point is 4. That is the elbow.",
         terms=[("Elbow method", "Pick the k where the error curve bends."),
@@ -198,9 +223,22 @@ SLIDES = [
         ask=("Is this curve from real data?", "Yes. It is the error of K-Means on the 383 real SKUs. Anyone can run it again in our Colab notebook."),
     ),
     dict(
+        title="A second check: silhouette",
+        say=[
+            "Thank you, Charith. The elbow gave us k equal to 4. We checked it in a second way, with the <b>silhouette score</b>.",
+            "The silhouette score tells how well each SKU sits inside its own group, compared with the nearest other group. Higher is better, and the most it can be is 1.",
+            "In the graph, the tallest bar is at k equal to 4, with a score of 0.37. So the elbow and the silhouette agree: 4 clusters.",
+        ],
+        example="Think of students at lunch. If everyone sits clearly with their own friend group, the score is high. If many sit between two groups, the score is low.",
+        terms=[("Silhouette score", "How well items fit their own cluster. Higher is better; the maximum is 1."),
+               ("Cohesion", "How close the items inside one cluster are."),
+               ("Separation", "How far one cluster is from the others.")],
+        ask=("Is 0.37 a good score?", "It is moderate, which is normal for real data. What matters is that k = 4 gives the highest score of all the values we tried."),
+    ),
+    dict(
         title="Step 3: Clusters become zones",
         say=[
-            "Thank you, Charith. K-Means found four clusters in the real data.",
+            "K-Means found four clusters in the real data.",
             "Cluster A is <b>fast movers</b>: 76 SKUs, ordered about 160 times each. They go on the front racks, nearest to packing. Cluster B is <b>bulky and heavy</b>: 84 SKUs, about 47 litres and 7.6 kilos on average. They stay at ground level.",
             "Cluster C is <b>seasonal</b>: 25 SKUs whose orders bunch into one month. They go to a flexible zone and move forward in season. Cluster D is <b>regular small items</b>: 198 SKUs, on the back racks.",
             "The floor plan on the right shows this. Fast movers are closest to packing and dispatch.",
@@ -213,9 +251,50 @@ SLIDES = [
         ask=("Who named the clusters?", "We did, from the averages of each cluster. K-Means only gives the groups; people read them and name them."),
     ),
     dict(
+        title="The four clusters in one picture",
+        say=[
+            "This picture shows all 383 SKUs. Every dot is one product, and its colour is its cluster.",
+            "A SKU has four numbers, so we cannot draw it directly. We used <b>PCA</b>, which is also in Unit 3. PCA squeezes the four numbers into two, and still keeps 76 percent of the variation.",
+            "Dots of the same colour sit together. That means similar products landed in the same cluster. The letters A, B, C and D mark the cluster centres.",
+        ],
+        example="PCA is like taking a photo of a statue. The statue has three dimensions and the photo has two, but from a good angle you still see its shape.",
+        terms=[("PCA", "Principal Component Analysis: reduces many numbers to a few."),
+               ("Principal component", "A new axis that carries the most variation in the data."),
+               ("Variation kept", "How much of the original information survives: here 76%.")],
+        ask=("Did PCA make the clusters?", "No. K-Means made the clusters using all four numbers. PCA was used only to draw them in two dimensions."),
+    ),
+    dict(
+        title="What each cluster looks like",
+        say=[
+            "These four graphs show the average of each number, cluster by cluster.",
+            "Cluster A is ordered the most, about 160 times, so it is the <b>fast movers</b>. Cluster B has the biggest volume and weight, about 47 litres and 7.6 kilos, so it is <b>bulky and heavy</b>.",
+            "Cluster C has the highest season index, 7.4, so it is <b>seasonal</b>. Cluster D is small and steady, so we call it <b>regular small items</b>.",
+            "This is how the clusters got their names.",
+        ],
+        example="It is like reading a class report. One section has the highest sports score, another the highest maths score. We name each section by what stands out.",
+        terms=[("Average (mean)", "The sum of the values divided by how many there are."),
+               ("Cluster profile", "The averages that describe one cluster."),
+               ("Season index", "Share of orders in the busiest month x 12.")],
+        ask=("Why does cluster B come second?", "Zones are ordered by average orders. B is ordered a little more than C and D, so it comes second."),
+    ),
+    dict(
+        title="Seasonal against fast mover",
+        say=[
+            "Here are two real products, month by month.",
+            "The pink line is the most ordered SKU of the seasonal cluster. It has 114 orders, and 76 of them came in a single month, January 2018.",
+            "The blue line is the most ordered fast mover. It has 527 orders, with 40 or more in seven different months.",
+            "So a seasonal product needs a front place only in its season, but a fast mover needs it for many months. Now Anbu will show how this solves our problem.",
+        ],
+        example="Crackers sell in a rush before Diwali. Milk sells every day. A shop keeps milk in front always, and brings crackers to the front only in the season.",
+        terms=[("Seasonal SKU", "A product whose orders bunch into a short period."),
+               ("Fast mover", "A product that is ordered often."),
+               ("Peak month", "The month with the most orders.")],
+        ask=("Is one peak month enough to call it seasonal?", "The data covers only about two years, so we can say its orders are bunched into one month. With more years we could confirm that it repeats every year."),
+    ),
+    dict(
         title="How this solves our problem",
         say=[
-            "How does this solve our problem? Our goal was better placement and less travel time.",
+            "Thank you, Rupesh. How does this solve our problem? Our goal was better placement and less travel time.",
             "First, <b>less walking</b>. Fast movers sit closest to packing. In our simple one-aisle model, the walk per pick falls from about 64 metres to about 47 metres. That is 27 percent less.",
             "Second, <b>better placement</b>. Bulky and heavy products get their own ground-level zone. Third, <b>season ready</b>. Seasonal products are one group, so they are easy to move forward in season.",
             "One honest point: the walking figure is a model, not a measurement in a real warehouse.",
@@ -225,6 +304,20 @@ SLIDES = [
                ("Model", "A simplified calculation that stands in for the real thing."),
                ("Typical product", "What the centroid of a cluster describes.")],
         ask=("Is 27 percent a real saving?", "It is what our simple model gives on the real order data. A real warehouse would need its own layout and measurements."),
+    ),
+    dict(
+        title="The aisle and the walk per pick",
+        say=[
+            "The coloured strip is one aisle of 128 metres, starting at the packing desk. Each cluster takes as much of the aisle as it has products.",
+            "Cluster A, the fast movers, comes first, in the first 25 metres. Cluster D, the regular small items, is the largest and takes the far end.",
+            "The bars show the walk for each pick. With no grouping it is about 64 metres. With the K-Means zones it is about 47 metres. That is 27 percent less.",
+            "This is a simple model, not a measurement in a real warehouse.",
+        ],
+        example="In a cupboard, the things used daily are kept near the door, and the things used rarely are kept deep inside. You reach less, because what you need most is nearest.",
+        terms=[("Aisle", "The walking path between racks."),
+               ("Walk per pick", "The average distance a worker walks to collect one item."),
+               ("Model", "A simplified calculation that stands in for the real thing.")],
+        ask=("How did you get 64 metres for no grouping?", "With no grouping a product can be anywhere, so on average it is half-way down the 128 metre aisle. Half of 128 is 64."),
     ),
     dict(
         title="Conclusion",
@@ -286,7 +379,7 @@ def box(flowables, bg, pad=8, width=CW):
 
 def band(speaker_no, name, color, slide_no):
     t = Table([[Paragraph(f"Speaker {speaker_no}: {name}", BAND),
-                Paragraph(f"Slide {slide_no} of 12  |  about 1 minute", BAND_R)]],
+                Paragraph(f"Slide {slide_no} of {len(SLIDES)}  |  under 1 minute", BAND_R)]],
               colWidths=[CW * 0.55, CW * 0.45])
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), color),
@@ -298,7 +391,7 @@ def band(speaker_no, name, color, slide_no):
 
 
 def slide_page(i, s):
-    speaker_no = i // 3 + 1
+    speaker_no = speaker_of(i)
     name, color = SPEAKERS[speaker_no - 1]
     thumb_w = 252
     thumb = Image(str(HERE / f"thumb-{i + 1:02d}.jpg"), width=thumb_w, height=thumb_w * 9 / 16)
@@ -332,11 +425,15 @@ def cover():
     logo = Image(str(HERE / "srm-logo.png"), width=150, height=150 * 314 / 795)
     logo.hAlign = "LEFT"
     rows = [[Paragraph("Speaker", CELL_H), Paragraph("Slides", CELL_H), Paragraph("What they explain", CELL_H), Paragraph("Time", CELL_H)]]
-    parts = ["Title, the problem statement, key terms", "Unit 3 solutions, our choice, why not the others",
-             "How K-Means works, preparing the data, choosing k", "Clusters to zones, how it solves the problem, conclusion"]
+    parts = ["Title, the problem, key terms, Unit 3 solutions, our choice",
+             "Why not the others, how K-Means works, the real data, choosing k",
+             "Silhouette check, clusters to zones, the cluster graphs",
+             "How it solves the problem, the aisle and the walk, conclusion"]
+    first = 1
     for n, ((name, _), part) in enumerate(zip(SPEAKERS, parts)):
-        rows.append([Paragraph(f"{n + 1}. {name}", CELL_B), Paragraph(f"{n * 3 + 1} to {n * 3 + 3}", CELL),
-                     Paragraph(part, CELL), Paragraph("about 3 min", CELL)])
+        rows.append([Paragraph(f"{n + 1}. {name}", CELL_B), Paragraph(f"{first} to {first + SPLIT[n] - 1}", CELL),
+                     Paragraph(part, CELL), Paragraph(f"about {SPLIT[n]} min", CELL)])
+        first += SPLIT[n]
     split = Table(rows, colWidths=[CW * 0.27, CW * 0.13, CW * 0.43, CW * 0.17])
     split.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), TEAL),
@@ -347,11 +444,11 @@ def cover():
         ("TOPPADDING", (0, 0), (-1, -1), 8), ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
     ]))
     tips = [
-        "Each speaker has three slides and three pages in this script: one page per slide.",
+        "One page for each slide. The table above shows which slides are yours.",
         "The <b>Say this</b> part is written the way you can speak it. Say it in your own words; do not read it word for word.",
         "Use the <b>Simple example</b> if the idea is not clear, or if you have time.",
-        "The last line of your third slide hands over to the next speaker by name.",
-        "The whole presentation takes about 12 minutes. Keep to about one minute per slide.",
+        "The last line of your last slide hands over to the next speaker by name.",
+        "The whole presentation takes about 15 minutes. Keep to under one minute per slide.",
         "The table, the curve and the four clusters come from real data (Olist's public orders). Only the walking distance is a simple model.",
     ]
     tip_flow = [Paragraph("HOW TO USE THIS SCRIPT", LABEL), Spacer(1, 4)]
@@ -363,7 +460,7 @@ def cover():
         Paragraph("21CSC305P  MACHINE LEARNING  |  PROJECT REVIEW 3", LABEL), Spacer(1, 6),
         Paragraph("Presentation Script", COVER_T), Spacer(1, 6),
         Paragraph("Grouping Warehouse Products with K-Means Clustering", COVER_S), Spacer(1, 4),
-        Paragraph("Team Cash guard (No. 17)  |  13 October 2026  |  12 slides, 4 speakers, 3 slides each", SMALL),
+        Paragraph("Team Cash guard (No. 17)  |  13 October 2026  |  18 slides, 4 speakers", SMALL),
         Spacer(1, 24),
         Paragraph("Who presents what", st("h2", fontName="Body-Bold", fontSize=14, leading=18, textColor=TEAL)), Spacer(1, 8),
         split, Spacer(1, 22),
