@@ -4,6 +4,8 @@ A student project for Machine Learning (21CSC305P), Project Review 3, by Team Ca
 
 **Live demo:** https://zanyanbu.github.io/warehouse-sku-kmeans/
 
+**Documentation:** [the problem, the solution, the method and the results with graphs](DOCUMENTATION.md)
+
 **Run the code:** [open the notebook in Google Colab](https://colab.research.google.com/github/ZANYANBU/warehouse-sku-kmeans/blob/main/notebook/warehouse_sku_kmeans.ipynb)
 
 ## Tested on real data
