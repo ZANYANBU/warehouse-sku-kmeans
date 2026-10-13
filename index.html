@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Warehouse SKU Clustering with K-Means: live demo</title>
+<meta name="description" content="A live, step-by-step demo of K-Means clustering that groups warehouse products (SKUs) into storage zones. Example data, generated in your browser.">
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #f4f4f1; --surface-1: #fcfcfb; --surface-2: #f0efec; --line: #e3e2dd;
+    --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #6f6e69;
+    --accent: #0f4c5c; --on-accent: #ffffff;
+    /* Cluster colours: four slots of the reference palette that pass the all-pairs
+       checks for a scatter plot in both modes. Each also has its own shape. */
+    --series-1: #2a78d6; --series-2: #eda100; --series-3: #e87ba4; --series-4: #008300;
+    --unassigned: #b4b3ad;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --surface-0: #111110; --surface-1: #1a1a19; --surface-2: #262624; --line: #343431;
+      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #a09f96;
+      --accent: #7fd0da; --on-accent: #0b0b0b;
+      --series-1: #3987e5; --series-2: #c98500; --series-3: #d55181; --series-4: #008300;
+      --unassigned: #5f5e59;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--surface-0); color: var(--text-primary); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 28px 0 8px; }
+  .kicker { margin: 0 0 6px; font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--text-secondary); }
+  h1 { margin: 0 0 8px; font-size: clamp(26px, 4.4vw, 38px); line-height: 1.15; }
+  h2 { margin: 0 0 4px; font-size: 21px; }
+  h3 { margin: 0 0 8px; font-size: 16px; }
+  p { margin: 0 0 12px; }
+  .lead { max-width: 760px; color: var(--text-secondary); font-size: 17px; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 4px; }
+  a.btn, button { font: inherit; font-weight: 600; min-height: 42px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-1); color: var(--text-primary); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  a.btn:hover, button:hover { border-color: var(--text-muted); }
+  button.primary, a.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  section { margin: 22px 0; }
+  .card { background: var(--surface-1); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .sub { color: var(--text-secondary); font-size: 14px; margin: 0 0 12px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 16px; margin: 0 0 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface-1); }
+  .seg button { border: 0; border-radius: 0; min-width: 46px; justify-content: center; background: transparent; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+  select { font: inherit; min-height: 42px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-1); color: var(--text-primary); }
+  .status { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; margin: 0 0 12px; padding: 10px 14px; background: var(--surface-2); border-radius: 10px; }
+  .status strong { font-size: 15px; }
+  .status span { color: var(--text-secondary); font-size: 14px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 16px; }
+  .side { display: grid; gap: 16px; align-content: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  .chart { position: relative; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .tick { fill: var(--text-secondary); font-size: 12px; }
+  .axis-title { fill: var(--text-secondary); font-size: 12.5px; font-weight: 600; }
+  .gridline { stroke: var(--line); stroke-width: 1; }
+  .pt path { stroke: var(--surface-1); stroke-width: 2; transition: fill .35s ease; }
+  .pt .hit { fill: transparent; stroke: none; pointer-events: all; }
+  .pt.hot path { stroke: var(--text-primary); }
+  .c0 { fill: var(--series-1); } .c1 { fill: var(--series-2); } .c2 { fill: var(--series-3); } .c3 { fill: var(--series-4); }
+  .un { fill: var(--unassigned); }
+  .cent { transition: transform .55s ease; pointer-events: none; }
+  .cent circle { fill: var(--surface-1); stroke-width: 3.5; }
+  .cent line { stroke: var(--text-primary); stroke-width: 2; stroke-linecap: round; }
+  .s0 { stroke: var(--series-1); } .s1 { stroke: var(--series-2); } .s2 { stroke: var(--series-3); } .s3 { stroke: var(--series-4); }
+  .elbow-line { fill: none; stroke: var(--series-1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .elbow-dot { fill: var(--series-1); stroke: var(--surface-1); stroke-width: 2; }
+  .elbow-now { fill: none; stroke: var(--text-primary); stroke-width: 2; }
+  .elbow-label { fill: var(--text-primary); font-size: 12.5px; font-weight: 700; }
+  .cross { stroke: var(--text-muted); stroke-width: 1; }
+  .tip { position: absolute; z-index: 5; pointer-events: none; min-width: 150px; max-width: 240px; padding: 8px 10px; border-radius: 8px; background: var(--text-primary); color: var(--surface-1); font-size: 13px; line-height: 1.35; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+  .tip b { display: block; font-size: 14px; }
+  .tip[hidden] { display: none; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--text-secondary); }
+  .legend li { display: inline-flex; align-items: center; gap: 7px; }
+  .legend strong { color: var(--text-primary); font-weight: 600; }
+  .sw { width: 16px; height: 16px; flex: none; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .tile { background: var(--surface-2); border-radius: 10px; padding: 10px 12px; }
+  .tile .v { font-size: 22px; font-weight: 700; line-height: 1.2; }
+  .tile .l { font-size: 12.5px; color: var(--text-secondary); }
+  .note { font-size: 13px; color: var(--text-muted); margin: 10px 0 0; }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 640px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12.5px; color: var(--text-secondary); font-weight: 600; white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td .name { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+  .plan { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; margin-top: 4px; }
+  .plan .pack { background: var(--accent); color: var(--on-accent); border-radius: 10px; padding: 12px 14px; font-weight: 700; display: flex; align-items: center; min-width: 150px; }
+  .zone { flex: 1 1 150px; background: var(--surface-2); border-radius: 10px; padding: 10px 12px; }
+  .zone .d { font-size: 12.5px; color: var(--text-secondary); }
+  .zone .t { display: flex; align-items: center; gap: 7px; font-weight: 600; margin: 2px 0; }
+  .steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; padding: 0; margin: 0; list-style: none; counter-reset: s; }
+  @media (max-width: 860px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tiles { grid-template-columns: minmax(0, 1fr); } }
+  .steps li { counter-increment: s; background: var(--surface-2); border-radius: 10px; padding: 12px; font-size: 14px; color: var(--text-secondary); }
+  .steps li::before { content: counter(s); display: inline-flex; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-weight: 700; align-items: center; justify-content: center; margin-bottom: 6px; }
+  .steps b { display: block; color: var(--text-primary); }
+  footer { margin: 28px 0 40px; color: var(--text-muted); font-size: 13.5px; }
+  .empty { color: var(--text-muted); font-size: 14px; padding: 8px 0; }
+  /* Shelves */
+  :root { --shelf: #b08a5b; --iw: clamp(23px, 6.4vw, 30px); }
+  @media (prefers-color-scheme: dark) { :root { --shelf: #8a6a45; } }
+  .seg.wide { flex-wrap: wrap; }
+  .seg.wide button { min-width: 0; padding: 8px 14px; }
+  .aisle { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; margin-top: 12px; }
+  .desk { align-self: stretch; background: var(--accent); color: var(--on-accent); border-radius: 10px; padding: 12px; font-weight: 700; display: flex; align-items: center; min-width: 96px; max-width: 120px; }
+  .rack { background: var(--surface-2); border-radius: 10px; padding: 10px 10px 8px; }
+  .rack .t { display: flex; align-items: center; gap: 7px; font-weight: 600; }
+  .rack .d { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 4px; }
+  .board { display: flex; align-items: flex-end; gap: 0; min-height: calc(var(--iw) + 12px); padding: 4px 4px 0; width: calc(10 * var(--iw) + 8px); border-bottom: 7px solid var(--shelf); border-radius: 0 0 2px 2px; }
+  .item { width: var(--iw); height: calc(var(--iw) + 4px); display: flex; align-items: flex-end; justify-content: center; line-height: 1; cursor: default; will-change: transform; }
+  .item:hover { filter: drop-shadow(0 0 3px var(--text-primary)); }
+  .item.dim { opacity: .45; }
+  .notice { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: var(--surface-2); color: var(--text-secondary); font-size: 14.5px; }
+  .notice b { color: var(--text-primary); }
+  tr.on td { background: var(--surface-2); font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) { .item { transition: none !important; } .cent { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">Machine Learning (21CSC305P) &middot; Project Review 3 &middot; Team Cash guard</p>
+    <h1>Grouping warehouse products with K-Means clustering</h1>
+    <p class="lead">A warehouse holds thousands of products (SKUs). This demo groups similar SKUs with K-Means, one round at a time, and turns each group into a storage zone so that the most-picked products sit closest to packing.</p>
+    <div class="links">
+      <a class="btn primary" href="#demo">Try the demo</a>
+      <a class="btn" href="slides/kmeans-sku-clustering.pptx" download>Slides (PPTX)</a>
+      <a class="btn" href="script/presentation-script.pdf">Presentation script (PDF)</a>
+      <a class="btn" href="https://github.com/ZANYANBU/warehouse-sku-kmeans">Source on GitHub</a>
+    </div>
+  </header>
+
+  <section id="demo" class="card" aria-labelledby="demo-h">
+    <h2 id="demo-h">Run K-Means yourself</h2>
+    <p class="sub">120 example SKUs, each described by four numbers: picks per week, season index, volume and a fragile flag. The data is made up in your browser; no real warehouse data is used.</p>
+
+    <div class="controls">
+      <div class="field"><span id="k-label">Number of clusters (k)</span>
+        <div class="seg kseg" role="group" aria-labelledby="k-label" id="k-seg">
+          <button type="button" data-k="2" aria-pressed="false">2</button>
+          <button type="button" data-k="3" aria-pressed="false">3</button>
+          <button type="button" data-k="4" aria-pressed="true">4</button>
+        </div>
+      </div>
+      <button type="button" class="primary" id="step">Next round</button>
+      <button type="button" id="run">Run to the end</button>
+      <button type="button" id="reset">New starting centres</button>
+      <button type="button" id="newdata">New example data</button>
+      <label class="field">Across (x)
+        <select id="xf"></select>
+      </label>
+      <label class="field">Up (y)
+        <select id="yf"></select>
+      </label>
+    </div>
+
+    <div class="status" role="status" aria-live="polite">
+      <strong id="status-main">Ready. Press Next round.</strong>
+      <span id="status-sub"></span>
+    </div>
+
+    <div class="grid">
+      <div>
+        <h3>Each mark is one SKU. Colour and shape show its cluster</h3>
+        <div class="chart" id="scatter-box">
+          <svg id="scatter" viewBox="0 0 640 410" role="img" aria-label="Scatter plot of the example SKUs, coloured and shaped by cluster. The same information is in the table below."></svg>
+          <div class="tip" id="tip" hidden></div>
+        </div>
+        <ul class="legend" id="legend" aria-label="Clusters"></ul>
+        <p class="note">The clusters are found using all four numbers. The picture can only show two of them at a time; change the axes to look from another side. Rings with a plus sign are the cluster centres (centroids).</p>
+        <p class="note">The first start for each k is picked to show the steps clearly. New starting centres is a plain random start, and K-Means can get stuck with a bad one. That is why it is normally run several times.</p>
+      </div>
+      <div class="side">
+        <div>
+          <h3>Elbow chart: error for each value of k</h3>
+          <div class="chart" id="elbow-box">
+            <svg id="elbow" viewBox="0 0 400 250" role="img" aria-label="Line chart of within-cluster variance for k from 1 to 8. The error falls quickly up to the bend and slowly after it."></svg>
+            <div class="tip" id="tip2" hidden></div>
+          </div>
+          <p class="note">Error = within-cluster variance on the scaled data (best of 10 runs for each k). Pick the k where the curve bends.</p>
+        </div>
+        <div>
+          <h3>Does grouping reduce walking?</h3>
+          <div class="tiles" id="tiles"></div>
+          <p class="note">A simple model, not a measurement: all 120 SKUs share one 40 m aisle that starts at packing, and the most-picked cluster takes the stretch nearest to it. With no grouping, a SKU is on average half-way down the aisle.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="shelves" class="card" aria-labelledby="shelf-h">
+    <h2 id="shelf-h">See it on the shelves</h2>
+    <p class="sub">The same 120 products on the racks of one aisle. Choose a solution from Unit 3 and watch the products move. The packing desk is on the left, so the first rack is the shortest walk.</p>
+    <div class="controls">
+      <div class="field"><span id="sol-label">Arrange the shelves with</span>
+        <div class="seg wide" role="group" aria-labelledby="sol-label" id="sol-seg">
+          <button type="button" data-sol="none" aria-pressed="true">No grouping</button>
+          <button type="button" data-sol="kmeans" aria-pressed="false">K-Means</button>
+          <button type="button" data-sol="hier" aria-pressed="false">Hierarchical</button>
+          <button type="button" data-sol="gmm" aria-pressed="false">Gaussian mixture</button>
+          <button type="button" data-sol="pca" aria-pressed="false">PCA</button>
+        </div>
+      </div>
+      <div class="field"><span id="k2-label">Number of groups (k)</span>
+        <div class="seg kseg" role="group" aria-labelledby="k2-label">
+          <button type="button" data-k="2" aria-pressed="false">2</button>
+          <button type="button" data-k="3" aria-pressed="false">3</button>
+          <button type="button" data-k="4" aria-pressed="true">4</button>
+        </div>
+      </div>
+    </div>
+    <div class="notice" id="sol-note" role="status" aria-live="polite"></div>
+    <div class="chart" id="aisle-box">
+      <div class="aisle" id="aisle"></div>
+      <div class="tip" id="tip3" hidden></div>
+    </div>
+    <p class="note">Inside a rack, light products sit on the top shelves and big ones at the bottom. Product names and pictures are examples. Point at a product to see its numbers.</p>
+    <h3 style="margin-top:16px">The solutions side by side</h3>
+    <div class="scroll"><table id="compare"></table></div>
+    <p class="note">Walk per pick uses the same simple model as above: one 40 m aisle, the most-picked group nearest the desk, each group taking as much of the aisle as it has products. It is a model on example data, not a measurement.</p>
+  </section>
+
+  <section class="card" aria-labelledby="zones-h">
+    <h2 id="zones-h">Clusters become zones</h2>
+    <p class="sub">Each cluster is read from its averages and given a place. The most-picked cluster goes nearest to packing.</p>
+    <div class="scroll"><table id="table" aria-describedby="zones-h"></table></div>
+    <h3 style="margin-top:16px">Example floor plan</h3>
+    <div class="plan" id="plan"></div>
+  </section>
+
+  <section class="card" aria-labelledby="how-h">
+    <h2 id="how-h">How K-Means works</h2>
+    <p class="sub">Each press of Next round does steps 2 to 4 once.</p>
+    <ol class="steps">
+      <li><b>Pick k centres</b>Choose k centroids at random to start.</li>
+      <li><b>Measure distance</b>Find the straight-line (Euclidean) distance from each SKU to every centroid.</li>
+      <li><b>Assign</b>Put each SKU in the cluster with the nearest centroid.</li>
+      <li><b>Update centres</b>Move each centroid to the mean of its SKUs.</li>
+      <li><b>Repeat</b>Do it again until no SKU changes its cluster.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>A student project for Machine Learning (21CSC305P), Unit 3. All numbers on this page come from example data generated in the browser. They show how the method works; they are not results from a real warehouse.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const SVG = "http://www.w3.org/2000/svg";
+  const FEATURES = [
+    { key: "picks", label: "Picks per week", short: "picks / week", digits: 0 },
+    { key: "season", label: "Season index", short: "season index", digits: 1 },
+    { key: "volume", label: "Volume (litres)", short: "litres", digits: 0 },
+    { key: "fragile", label: "Fragile (0 or 1)", short: "fragile", digits: 0 },
+  ];
+  const AXES = ["picks", "season", "volume"];
+  const KEYS = FEATURES.map((f) => f.key);
+  // Four kinds of product hidden in the example data. K-Means is not told about them.
+  // Their ranges overlap on purpose, as real products do, so the solutions can disagree.
+  const KINDS = [
+    { picks: [55, 160], season: [0.9, 1.7], volume: [1, 14], fragile: 0.04 },   // fast movers
+    { picks: [8, 70], season: [1.6, 4.2], volume: [4, 45], fragile: 0.04 },     // seasonal
+    { picks: [4, 40], season: [0.9, 1.8], volume: [60, 240], fragile: 0 },      // bulky
+    { picks: [12, 85], season: [0.9, 2.0], volume: [2, 24], fragile: 1 },       // fragile
+  ];
+  const WIDE = { picks: [4, 160], season: [0.9, 4.2], volume: [1, 240] };
+  const AISLE = 40;   // metres of shelving that hold all the example SKUs
+  const span = (m) => (Math.round(m.from) === Math.round(m.to) ? `at ${fmt(m.from)} m` : `${fmt(m.from)} to ${fmt(m.to)} m`);
+  // Example products for each hidden kind, so the shelves have something to show.
+  const PRODUCTS = [
+    [["Water bottle", "\u{1F964}"], ["Biscuits", "\u{1F36A}"], ["Bread", "\u{1F35E}"], ["Noodles", "\u{1F35C}"], ["Milk", "\u{1F95B}"], ["Chocolate", "\u{1F36B}"], ["Tea", "\u{1F375}"], ["Soap", "\u{1F9FC}"]],
+    [["Umbrella", "\u2602\uFE0F"], ["Raincoat", "\u{1F9E5}"], ["Scarf", "\u{1F9E3}"], ["Fireworks", "\u{1F386}"], ["School bag", "\u{1F392}"], ["Festive tree", "\u{1F384}"], ["Ice cream", "\u{1F366}"], ["Sunglasses", "\u{1F576}\uFE0F"]],
+    [["Oil drum", "\u{1F6E2}\uFE0F"], ["Carton box", "\u{1F4E6}"], ["Mattress", "\u{1F6CF}\uFE0F"], ["Laundry basket", "\u{1F9FA}"], ["Bicycle", "\u{1F6B2}"], ["Suitcase", "\u{1F9F3}"], ["Rice sack", "\u{1F33E}"], ["Water can", "\u{1F6B0}"]],
+    [["Wine glasses", "\u{1F377}"], ["Clay pot", "\u{1F3FA}"], ["Light bulb", "\u{1F4A1}"], ["Eggs", "\u{1F95A}"], ["Ceramic bottle", "\u{1F376}"], ["Photo frame", "\u{1F5BC}\uFE0F"], ["Tea cups", "\u2615"], ["Crystal bowl", "\u{1F52E}"]],
+  ];
+  const TAGS = {
+    fast: ["Fast movers", "Front racks, near packing"],
+    seasonal: ["Seasonal", "Flexible zone, moved forward in season"],
+    bulky: ["Bulky / heavy", "Ground level, near the loading dock"],
+    special: ["Special care", "Separate protected area"],
+    regular: ["Regular items", "Middle and back racks"],
+  };
+  const SHAPES = [
+    "M-5.2,0a5.2,5.2 0 1,0 10.4,0a5.2,5.2 0 1,0 -10.4,0",   // circle
+    "M-4.6,-4.6h9.2v9.2h-9.2z",                               // square
+    "M0,-6.2L5.8,4.4L-5.8,4.4z",                              // triangle
+    "M0,-6.6L6,0L0,6.6L-6,0z",                                // diamond
+  ];
+
+  // ---- data ----------------------------------------------------------------
+  function rng(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function makeData(seed) {
+    const r = rng(seed), out = [];
+    const u = (lo, hi) => lo + (hi - lo) * r();
+    for (const [ki, kind] of KINDS.entries()) {
+      for (let i = 0; i < 30; i++) {
+        const [name, icon] = PRODUCTS[ki][i % PRODUCTS[ki].length];
+        // About one number in seven is unusual for its kind: a biscuit that sells
+        // mostly at festivals, a small item that comes in a big pack.
+        const draw = (key) => (r() < 0.15 ? u(...WIDE[key]) : u(...kind[key]));
+        out.push({
+          name, icon,
+          picks: Math.round(draw("picks")),
+          season: Math.round(draw("season") * 10) / 10,
+          volume: Math.round(draw("volume")),
+          fragile: r() < kind.fragile ? 1 : 0,
+        });
+      }
+    }
+    for (let i = out.length - 1; i > 0; i--) {           // shuffle, so the id says nothing about the kind
+      const j = Math.floor(r() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    out.forEach((d, i) => { d.id = "SKU-" + String(i + 1).padStart(3, "0"); });
+    return out;
+  }
+  // Min-max scaling: every feature runs from 0 to 1, so volume cannot dominate.
+  function scale(data) {
+    const lo = {}, hi = {};
+    for (const k of KEYS) { lo[k] = Math.min(...data.map((d) => d[k])); hi[k] = Math.max(...data.map((d) => d[k])); }
+    return data.map((d) => KEYS.map((k) => (hi[k] === lo[k] ? 0 : (d[k] - lo[k]) / (hi[k] - lo[k]))));
+  }
+
+  // ---- K-Means -------------------------------------------------------------
+  const dist2 = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) { const t = a[i] - b[i]; s += t * t; } return s; };
+  function nearest(v, cents) { let best = 0, bd = Infinity; for (let j = 0; j < cents.length; j++) { const d = dist2(v, cents[j]); if (d < bd) { bd = d; best = j; } } return best; }
+  function pickCentres(X, k, r) { const idx = new Set(); while (idx.size < k) idx.add(Math.floor(r() * X.length)); return [...idx].map((i) => X[i].slice()); }
+  const assignAll = (X, cents) => X.map((v) => nearest(v, cents));
+  function means(X, assign, cents) {
+    return cents.map((c, j) => {
+      const mem = X.filter((_, i) => assign[i] === j);
+      return mem.length ? c.map((_, f) => mem.reduce((s, v) => s + v[f], 0) / mem.length) : c.slice();
+    });
+  }
+  const errorOf = (X, assign, cents) => X.reduce((s, v, i) => s + dist2(v, cents[assign[i]]), 0);
+  function runKMeans(X, k, r) {
+    let cents = pickCentres(X, k, r), assign = assignAll(X, cents);
+    for (let it = 0; it < 100; it++) {
+      cents = means(X, assign, cents);
+      const next = assignAll(X, cents);
+      const same = next.every((a, i) => a === assign[i]);
+      assign = next;
+      if (same) break;
+    }
+    return { error: errorOf(X, assign, cents), assign };
+  }
+  function bestKMeans(X, k, seed) {
+    let best = null;
+    for (let t = 0; t < 10; t++) { const r = runKMeans(X, k, rng(seed * 1000 + k * 31 + t)); if (!best || r.error < best.error) best = r; }
+    return best;
+  }
+  // Hierarchical clustering, bottom up with average linkage: start with every SKU
+  // alone, keep joining the two closest groups, stop when k groups are left.
+  function hierarchical(X, k) {
+    const n = X.length, P = X.map((a) => X.map((b) => Math.sqrt(dist2(a, b))));
+    let groups = X.map((_, i) => [i]);
+    while (groups.length > k) {
+      let bi = 0, bj = 1, bd = Infinity;
+      for (let i = 0; i < groups.length; i++) for (let j = i + 1; j < groups.length; j++) {
+        let sum = 0;
+        for (const a of groups[i]) for (const b of groups[j]) sum += P[a][b];
+        const d = sum / (groups[i].length * groups[j].length);
+        if (d < bd) { bd = d; bi = i; bj = j; }
+      }
+      groups[bi] = groups[bi].concat(groups[bj]); groups.splice(bj, 1);
+    }
+    const assign = new Array(n);
+    groups.forEach((g, j) => g.forEach((i) => { assign[i] = j; }));
+    return assign;
+  }
+  // Mixture of Gaussians fitted with EM (one variance per feature). Returns, for
+  // every SKU, its probability of belonging to each group.
+  function mixture(X, k, start) {
+    const n = X.length, d = X[0].length;
+    let resp = X.map((_, i) => { const r = new Array(k).fill(0); r[start[i]] = 1; return r; });
+    for (let it = 0; it < 60; it++) {
+      const pi = [], mu = [], va = [];
+      for (let j = 0; j < k; j++) {                                   // M-step: weights, means, variances
+        let nj = 1e-9; for (let i = 0; i < n; i++) nj += resp[i][j];
+        const m = new Array(d).fill(0), v = new Array(d).fill(0);
+        for (let i = 0; i < n; i++) for (let f = 0; f < d; f++) m[f] += resp[i][j] * X[i][f];
+        for (let f = 0; f < d; f++) m[f] /= nj;
+        for (let i = 0; i < n; i++) for (let f = 0; f < d; f++) v[f] += resp[i][j] * (X[i][f] - m[f]) ** 2;
+        for (let f = 0; f < d; f++) v[f] = v[f] / nj + 1e-3;
+        pi.push(nj / n); mu.push(m); va.push(v);
+      }
+      resp = X.map((x) => {                                           // E-step: probabilities, in logs
+        const lp = mu.map((m, j) => { let l = Math.log(pi[j]); for (let f = 0; f < d; f++) l += -0.5 * Math.log(2 * Math.PI * va[j][f]) - (x[f] - m[f]) ** 2 / (2 * va[j][f]); return l; });
+        const mx = Math.max(...lp), ex = lp.map((l) => Math.exp(l - mx)), sum = ex.reduce((a, b) => a + b, 0);
+        return ex.map((e) => e / sum);
+      });
+    }
+    return resp;
+  }
+  // How many SKUs two groupings agree on, after pairing up their groups.
+  function agreement(a, b, k) {
+    const M = Array.from({ length: k }, () => new Array(k).fill(0));
+    a.forEach((x, i) => { M[x][b[i]]++; });
+    const usedR = new Set(), usedC = new Set(); let total = 0;
+    for (let t = 0; t < k; t++) {
+      let best = -1, bi = 0, bj = 0;
+      for (let i = 0; i < k; i++) if (!usedR.has(i)) for (let j = 0; j < k; j++) if (!usedC.has(j) && M[i][j] > best) { best = M[i][j]; bi = i; bj = j; }
+      usedR.add(bi); usedC.add(bj); total += best;
+    }
+    return total;
+  }
+  function elbowOf(X, seed) {
+    const out = [];
+    for (let k = 1; k <= 8; k++) {
+      let best = Infinity;
+      for (let t = 0; t < 10; t++) best = Math.min(best, runKMeans(X, k, rng(seed * 1000 + k * 31 + t)).error);
+      out.push({ k, error: best });
+    }
+    return out;
+  }
+
+  // ---- state ---------------------------------------------------------------
+  const S = { sol: "none", sols: null, seed: 7, initSeed: 1, tries: 0, k: 4, data: [], X: [], cents: [], assign: null, round: 0, done: false, timer: null, elbow: [], xf: "picks", yf: "volume" };
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(SVG, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+  const h = (tag, cls, text, parent) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; if (parent) parent.appendChild(n); return n; };
+  const fmt = (v, d = 0) => v.toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  const startKey = (k, initSeed) => S.seed * 97 + initSeed * 13 + k;
+  // How a start ends, without drawing it.
+  function simulate(k, initSeed) {
+    let cents = pickCentres(S.X, k, rng(startKey(k, initSeed))), assign = null, rounds = 0;
+    for (;;) {
+      const next = assignAll(S.X, cents);
+      if (assign && next.every((a, i) => a === assign[i])) break;
+      assign = next; cents = means(S.X, next, cents);
+      if (++rounds > 100) break;
+    }
+    return { rounds, error: errorOf(S.X, assign, cents) };
+  }
+  // The first start for each k is picked to show the steps clearly: one that
+  // reaches the best grouping, and takes the most rounds to get there. "New
+  // starting centres" is a plain random start, and may get stuck.
+  function showcaseStart(k) {
+    const best = S.elbow[k - 1].error;
+    let pick = 1, most = -1;
+    for (let s = 1; s <= 40; s++) {
+      const r = simulate(k, s);
+      if (r.error <= best * 1.02 && r.rounds > most) { most = r.rounds; pick = s; }
+    }
+    return pick;
+  }
+  function newData() { S.data = makeData(S.seed); S.X = scale(S.data); S.elbow = elbowOf(S.X, S.seed); S.sols = null; S.initSeed = showcaseStart(S.k); restart(); drawShelves(false); }
+  // Every solution's grouping for the current data and k, worked out once.
+  function solutions() {
+    if (S.sols) return S.sols;
+    const n = S.data.length, per = Math.ceil(n / S.k), order = S.data.map((_, i) => i), r = rng(S.seed * 7 + 5);
+    for (let i = n - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+    const place = new Array(n); order.forEach((i, pos) => { place[i] = Math.floor(pos / per); });   // rack of each SKU when nothing is grouped
+    const km = bestKMeans(S.X, S.k, S.seed).assign, hi = hierarchical(S.X, S.k), resp = mixture(S.X, S.k, km);
+    const gm = resp.map((p) => p.indexOf(Math.max(...p)));
+    S.sols = {
+      none: { place, walk: AISLE / 2 },
+      kmeans: { assign: km, sum: summarise(km) },
+      hier: { assign: hi, sum: summarise(hi), same: agreement(hi, km, S.k) },
+      gmm: { assign: gm, sum: summarise(gm), same: agreement(gm, km, S.k), split: resp.filter((p) => Math.max(...p) < 0.9).length },
+    };
+    return S.sols;
+  }
+  function restart() {
+    stopRun();
+    S.cents = pickCentres(S.X, S.k, rng(startKey(S.k, S.initSeed)));
+    S.assign = null; S.round = 0; S.done = false;
+    buildCentres(); render();
+  }
+  function step() {
+    if (S.done) return;
+    const next = assignAll(S.X, S.cents);
+    const changed = S.assign ? next.filter((a, i) => a !== S.assign[i]).length : next.length;
+    S.assign = next;
+    if (changed === 0) { S.done = true; stopRun(); }
+    else { S.cents = means(S.X, next, S.cents); S.round++; }
+    S.changed = changed;
+    render();
+  }
+  function stopRun() { if (S.timer) { clearInterval(S.timer); S.timer = null; } $("run").textContent = "Run to the end"; }
+  function toggleRun() {
+    if (S.timer) return stopRun();
+    if (S.done) restart();
+    $("run").textContent = "Pause";
+    step();
+    S.timer = setInterval(step, 750);
+  }
+
+  // ---- cluster summary -----------------------------------------------------
+  const summary = () => (S.assign ? summarise(S.assign) : null);
+  function summarise(assign) {
+    const rows = [];
+    for (let j = 0; j < S.k; j++) {
+      const mem = S.data.filter((_, i) => assign[i] === j);
+      const avg = (key) => (mem.length ? mem.reduce((s, d) => s + d[key], 0) / mem.length : 0);
+      const m = { j, n: mem.length, picks: avg("picks"), season: avg("season"), volume: avg("volume"), fragile: avg("fragile") };
+      m.tag = m.fragile >= 0.5 ? "special" : m.volume >= 80 ? "bulky" : m.season >= 2 ? "seasonal" : m.picks >= 60 ? "fast" : "regular";
+      rows.push(m);
+    }
+    // One aisle holds every SKU. The most-picked cluster takes the stretch nearest
+    // to packing, and each cluster takes as much of the aisle as it has SKUs, so a
+    // big cluster reaches further. A SKU is counted at the middle of its stretch.
+    let placed = 0;
+    [...rows].sort((a, b) => b.picks - a.picks).forEach((m, rank) => {
+      m.zone = rank; m.from = AISLE * placed / S.data.length; placed += m.n; m.to = AISLE * placed / S.data.length; m.metres = (m.from + m.to) / 2;
+    });
+    const total = S.data.reduce((s, d) => s + d.picks, 0);
+    const grouped = S.data.reduce((s, d, i) => s + d.picks * rows[assign[i]].metres, 0) / total;
+    return { rows, grouped, random: AISLE / 2 };       // with no grouping a SKU is, on average, half-way down
+  }
+
+  // ---- drawing -------------------------------------------------------------
+  const SC = { w: 640, h: 410, l: 58, r: 18, t: 14, b: 46 };
+  function niceTicks(lo, hi, n = 5) {
+    const span = hi - lo || 1, raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const stepv = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw);
+    const start = Math.floor(lo / stepv) * stepv, out = [];
+    for (let v = start; ; v += stepv) {                 // the last tick is at or past the largest value
+      out.push(Math.round(v * 1000) / 1000);
+      if (v >= hi - 1e-9 || out.length > 50) break;
+    }
+    return out;
+  }
+  function scales() {
+    const f = (key) => { const vals = S.data.map((d) => d[key]); const t = niceTicks(Math.min(...vals), Math.max(...vals)); return { t, lo: t[0], hi: t[t.length - 1] }; };
+    const X = f(S.xf), Y = f(S.yf);
+    return {
+      X, Y,
+      x: (v) => SC.l + ((v - X.lo) / (X.hi - X.lo)) * (SC.w - SC.l - SC.r),
+      y: (v) => SC.h - SC.b - ((v - Y.lo) / (Y.hi - Y.lo)) * (SC.h - SC.t - SC.b),
+    };
+  }
+  // A centroid lives in scaled space; bring it back to real units for the two axes shown.
+  function unscale(cent, key) {
+    const i = KEYS.indexOf(key), vals = S.data.map((d) => d[key]);
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    return lo + cent[i] * (hi - lo);
+  }
+  const label = (key) => FEATURES.find((f) => f.key === key).label;
+
+  let centLayer = null;
+  function buildCentres() {
+    const svg = $("scatter");
+    if (centLayer) centLayer.remove();
+    centLayer = el("g", { "aria-hidden": "true" });
+    for (let j = 0; j < S.k; j++) {
+      const g = el("g", { class: "cent" }, centLayer);
+      el("circle", { r: 10, class: "s" + j }, g);
+      el("line", { x1: -4.5, x2: 4.5, y1: 0, y2: 0 }, g);
+      el("line", { x1: 0, x2: 0, y1: -4.5, y2: 4.5 }, g);
+    }
+    svg.appendChild(centLayer);
+  }
+  function drawScatter() {
+    const svg = $("scatter"), sc = scales();
+    [...svg.querySelectorAll(".frame")].forEach((n) => n.remove());
+    const frame = el("g", { class: "frame" });
+    svg.insertBefore(frame, centLayer);
+    for (const v of sc.Y.t) {
+      el("line", { class: "gridline", x1: SC.l, x2: SC.w - SC.r, y1: sc.y(v), y2: sc.y(v) }, frame);
+      el("text", { class: "tick", x: SC.l - 8, y: sc.y(v) + 4, "text-anchor": "end" }, frame).textContent = fmt(v, v % 1 ? 1 : 0);
+    }
+    for (const v of sc.X.t) el("text", { class: "tick", x: sc.x(v), y: SC.h - SC.b + 18, "text-anchor": "middle" }, frame).textContent = fmt(v, v % 1 ? 1 : 0);
+    el("text", { class: "axis-title", x: (SC.l + SC.w - SC.r) / 2, y: SC.h - 8, "text-anchor": "middle" }, frame).textContent = label(S.xf);
+    el("text", { class: "axis-title", transform: `translate(14 ${(SC.t + SC.h - SC.b) / 2}) rotate(-90)`, "text-anchor": "middle" }, frame).textContent = label(S.yf);
+    const sum = summary();
+    S.data.forEach((d, i) => {
+      const c = S.assign ? S.assign[i] : -1;
+      const g = el("g", { class: "pt", transform: `translate(${sc.x(d[S.xf]).toFixed(1)} ${sc.y(d[S.yf]).toFixed(1)})` }, frame);
+      el("path", { d: SHAPES[c < 0 ? 0 : c], class: c < 0 ? "un" : "c" + c }, g);
+      const hit = el("circle", { class: "hit", r: 11 }, g);
+      hit.addEventListener("pointerenter", () => { g.classList.add("hot"); showTip("tip", "scatter-box", g, [d.id, c < 0 ? "Not grouped yet" : `Cluster ${c + 1}: ${TAGS[sum.rows[c].tag][0]}`, `${fmt(d.picks)} picks per week`, `Season index ${fmt(d.season, 1)}`, `${fmt(d.volume)} litres`, d.fragile ? "Fragile" : "Not fragile"]); });
+      hit.addEventListener("pointerleave", () => { g.classList.remove("hot"); $("tip").hidden = true; });
+    });
+    [...centLayer.children].forEach((g, j) => {
+      const fresh = !g.dataset.placed;                    // a new centre appears in place; only later moves glide
+      if (fresh) g.style.transition = "none";
+      g.style.transform = `translate(${sc.x(unscale(S.cents[j], S.xf)).toFixed(1)}px, ${sc.y(unscale(S.cents[j], S.yf)).toFixed(1)}px)`;
+      if (fresh) { g.getBoundingClientRect(); g.style.transition = ""; g.dataset.placed = "1"; }
+    });
+  }
+  function showTip(tipId, boxId, target, lines) {
+    const tip = $(tipId), box = $(boxId).getBoundingClientRect(), r = target.getBoundingClientRect();
+    tip.textContent = "";
+    lines.forEach((t, i) => h(i === 0 ? "b" : "div", "", t, tip));
+    tip.hidden = false;
+    const w = tip.offsetWidth, ht = tip.offsetHeight;
+    let left = r.left + r.width / 2 - box.left + 14, top = r.top - box.top - ht - 8;
+    if (left + w > box.width) left = r.left - box.left - w - 8;
+    if (top < 0) top = r.bottom - box.top + 8;
+    tip.style.left = Math.max(0, left) + "px"; tip.style.top = top + "px";
+  }
+  function swatch(j, parent) {
+    const s = document.createElementNS(SVG, "svg");
+    s.setAttribute("class", "sw"); s.setAttribute("viewBox", "-8 -8 16 16"); s.setAttribute("aria-hidden", "true");
+    el("path", { d: SHAPES[j < 0 ? 0 : j], class: j < 0 ? "un" : "c" + j }, s);
+    parent.appendChild(s);
+  }
+  function drawLegend(sum) {
+    const ul = $("legend"); ul.textContent = "";
+    if (!sum) { const li = h("li", "", null, ul); swatch(-1, li); h("span", "", "Not grouped yet", li); }
+    else sum.rows.forEach((m) => { const li = h("li", "", null, ul); swatch(m.j, li); h("strong", "", `Cluster ${m.j + 1}`, li); h("span", "", `${TAGS[m.tag][0]}, ${m.n} SKUs`, li); });
+    const li = h("li", "", null, ul);
+    const s = document.createElementNS(SVG, "svg"); s.setAttribute("class", "sw"); s.setAttribute("viewBox", "-12 -12 24 24"); s.setAttribute("aria-hidden", "true");
+    const g = el("g", { class: "cent" }, s); el("circle", { r: 9, class: "s0", style: "stroke: var(--text-secondary)" }, g); el("line", { x1: -4, x2: 4, y1: 0, y2: 0 }, g); el("line", { x1: 0, x2: 0, y1: -4, y2: 4 }, g);
+    li.appendChild(s); h("span", "", "Cluster centre", li);
+  }
+
+  const EL = { w: 400, h: 250, l: 46, r: 14, t: 22, b: 42 };
+  function drawElbow() {
+    const svg = $("elbow"); svg.textContent = "";
+    const max = Math.max(...S.elbow.map((e) => e.error)), ticks = niceTicks(0, max, 4), hi = ticks[ticks.length - 1];
+    const x = (k) => EL.l + ((k - 1) / 7) * (EL.w - EL.l - EL.r), y = (v) => EL.h - EL.b - (v / hi) * (EL.h - EL.t - EL.b);
+    for (const v of ticks) {
+      el("line", { class: "gridline", x1: EL.l, x2: EL.w - EL.r, y1: y(v), y2: y(v) }, svg);
+      el("text", { class: "tick", x: EL.l - 8, y: y(v) + 4, "text-anchor": "end" }, svg).textContent = fmt(v, v % 1 ? 1 : 0);
+    }
+    for (const e of S.elbow) el("text", { class: "tick", x: x(e.k), y: EL.h - EL.b + 18, "text-anchor": "middle" }, svg).textContent = e.k;
+    el("text", { class: "axis-title", x: (EL.l + EL.w - EL.r) / 2, y: EL.h - 6, "text-anchor": "middle" }, svg).textContent = "Number of clusters (k)";
+    const cross = el("line", { class: "cross", y1: EL.t, y2: EL.h - EL.b, visibility: "hidden" }, svg);
+    el("path", { class: "elbow-line", d: S.elbow.map((e, i) => `${i ? "L" : "M"}${x(e.k).toFixed(1)},${y(e.error).toFixed(1)}`).join("") }, svg);
+    const dots = S.elbow.map((e) => el("circle", { class: "elbow-dot", cx: x(e.k), cy: y(e.error), r: 4.5 }, svg));
+    const now = S.elbow[S.k - 1];
+    el("circle", { class: "elbow-now", cx: x(now.k), cy: y(now.error), r: 9 }, svg);
+    el("text", { class: "elbow-label", x: x(now.k) + 13, y: y(now.error) - 9 }, svg).textContent = `k = ${now.k}`;
+    const pad = el("rect", { x: EL.l - 10, y: EL.t, width: EL.w - EL.l - EL.r + 20, height: EL.h - EL.t - EL.b, fill: "transparent" }, svg);
+    pad.addEventListener("pointermove", (ev) => {
+      const r = svg.getBoundingClientRect(), px = ((ev.clientX - r.left) / r.width) * EL.w;
+      const k = Math.min(8, Math.max(1, Math.round(1 + ((px - EL.l) / (EL.w - EL.l - EL.r)) * 7))), e = S.elbow[k - 1];
+      cross.setAttribute("x1", x(k)); cross.setAttribute("x2", x(k)); cross.setAttribute("visibility", "visible");
+      showTip("tip2", "elbow-box", dots[k - 1], [`k = ${k}`, `Error ${fmt(e.error, 2)}`, k > 1 ? `${fmt(100 * (1 - e.error / S.elbow[k - 2].error))}% lower than k = ${k - 1}` : "All SKUs in one group"]);
+    });
+    pad.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); $("tip2").hidden = true; });
+  }
+
+  function drawTiles(sum) {
+    const box = $("tiles"); box.textContent = "";
+    const tile = (v, l) => { const t = h("div", "tile", null, box); h("div", "v", v, t); h("div", "l", l, t); };
+    if (!sum) { tile("–", "No grouping, per pick"); tile("–", "Grouped by cluster, per pick"); tile("–", "Less walking in this model"); return; }
+    tile(`${fmt(sum.random, 1)} m`, "No grouping, per pick");
+    tile(`${fmt(sum.grouped, 1)} m`, "Grouped by cluster, per pick");
+    tile(`${fmt(100 * (1 - sum.grouped / sum.random))}%`, "Less walking in this model");
+  }
+  function drawTable(sum) {
+    const table = $("table"); table.textContent = "";
+    const head = h("tr", "", null, h("thead", "", null, table));
+    [["Cluster", ""], ["SKUs", "num"], ["Avg picks / week", "num"], ["Avg season index", "num"], ["Avg volume (L)", "num"], ["Fragile", "num"], ["Zone", ""], ["Where to place", ""]].forEach(([t, c]) => { const th = h("th", c, t, head); th.scope = "col"; });
+    const body = h("tbody", "", null, table);
+    if (!sum) { const td = h("td", "empty", "Press Next round to group the SKUs.", h("tr", "", null, body)); td.colSpan = 8; return; }
+    [...sum.rows].sort((a, b) => a.zone - b.zone).forEach((m) => {
+      const tr = h("tr", "", null, body), td = h("td", "", null, tr), nm = h("span", "name", null, td);
+      swatch(m.j, nm); h("span", "", `${m.j + 1}. ${TAGS[m.tag][0]}`, nm);
+      h("td", "num", fmt(m.n), tr); h("td", "num", fmt(m.picks), tr); h("td", "num", fmt(m.season, 1), tr); h("td", "num", fmt(m.volume), tr);
+      h("td", "num", `${fmt(100 * m.fragile)}%`, tr);
+      h("td", "", `${"ABCD"[m.zone]}, ${span(m)} from packing`, tr); h("td", "", TAGS[m.tag][1], tr);
+    });
+  }
+  function drawPlan(sum) {
+    const plan = $("plan"); plan.textContent = "";
+    h("div", "pack", "Packing and dispatch", plan);
+    if (!sum) { h("div", "empty", "Zones appear after the first round.", plan); return; }
+    [...sum.rows].sort((a, b) => a.zone - b.zone).forEach((m) => {
+      const z = h("div", "zone", null, plan);
+      h("div", "d", `Zone ${"ABCD"[m.zone]}, ${span(m)}`, z);
+      const t = h("div", "t", null, z); swatch(m.j, t); h("span", "", TAGS[m.tag][0], t);
+      h("div", "d", `${m.n} SKUs, about ${fmt(m.picks)} picks a week each`, z);
+    });
+  }
+  // ---- shelves --------------------------------------------------------------
+  const SOL_NAMES = { none: "No grouping", kmeans: "K-Means (our choice)", hier: "Hierarchical clustering", gmm: "Mixture of Gaussians", pca: "PCA / factor analysis" };
+  function racksFor(key) {
+    const sols = solutions(), letters = "ABCD";
+    if (key === "none" || key === "pca") {
+      return Array.from({ length: S.k }, (_, z) => ({ title: `Rack ${letters[z]}, ${span({ from: AISLE * z / S.k, to: AISLE * (z + 1) / S.k })}`, sub: "Mixed products", sw: null, items: S.data.map((_, i) => i).filter((i) => sols.none.place[i] === z) }));
+    }
+    const { assign, sum } = sols[key];
+    return [...sum.rows].sort((a, b) => a.zone - b.zone).map((m) => ({
+      title: `Rack ${letters[m.zone]}, ${span(m)}`, sub: `${TAGS[m.tag][0]}, ${m.n} SKUs`, sw: m.j,
+      items: S.data.map((_, i) => i).filter((i) => assign[i] === m.j),
+    }));
+  }
+  function drawShelves(animate = true) {
+    const aisle = $("aisle"), sols = solutions();
+    const before = new Map();
+    if (animate) aisle.querySelectorAll(".item").forEach((n) => before.set(n.dataset.id, n.getBoundingClientRect()));
+    aisle.textContent = "";
+    h("div", "desk", "Packing desk", aisle);
+    for (const rack of racksFor(S.sol)) {
+      const box = h("div", "rack", null, aisle), t = h("div", "t", null, box);
+      if (rack.sw != null) swatch(rack.sw, t);
+      h("span", "", rack.title, t); h("div", "d", rack.sub, box);
+      const items = [...rack.items].sort((a, b) => S.data[a].volume - S.data[b].volume);    // light on top, big at the bottom
+      for (let r = 0; r < Math.max(1, Math.ceil(items.length / 10)); r++) {
+        const board = h("div", "board", null, box);
+        for (const i of items.slice(r * 10, r * 10 + 10)) {
+          const d = S.data[i], it = h("span", "item" + (S.sol === "pca" ? " dim" : ""), d.icon, board);
+          it.dataset.id = d.id; it.setAttribute("role", "img"); it.setAttribute("aria-label", `${d.name}, ${d.picks} picks a week`);
+          it.style.fontSize = `calc(var(--iw) * ${(0.58 + 0.3 * Math.min(1, d.volume / 200)).toFixed(2)})`;   // bigger products look bigger
+          it.addEventListener("pointerenter", () => showTip("tip3", "aisle-box", it, [d.name, d.id, `${fmt(d.picks)} picks per week`, `Season index ${fmt(d.season, 1)}`, `${fmt(d.volume)} litres`, d.fragile ? "Fragile" : "Not fragile"]));
+          it.addEventListener("pointerleave", () => { $("tip3").hidden = true; });
+        }
+      }
+    }
+    if (animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      aisle.querySelectorAll(".item").forEach((n) => {                 // each product glides from where it was
+        const was = before.get(n.dataset.id); if (!was) return;
+        const now = n.getBoundingClientRect(), dx = was.left - now.left, dy = was.top - now.top;
+        if (!dx && !dy) return;
+        n.style.transition = "none"; n.style.transform = `translate(${dx}px, ${dy}px)`;
+        requestAnimationFrame(() => requestAnimationFrame(() => { n.style.transition = "transform .8s cubic-bezier(.2,.7,.2,1)"; n.style.transform = ""; }));
+      });
+    }
+    const note = $("sol-note"), k = S.k, n = S.data.length;
+    const walk = (key) => (key === "none" || key === "pca" ? sols.none.walk : sols[key].sum.grouped);
+    const b = (text) => { const x = document.createElement("b"); x.textContent = text; return x; };
+    note.textContent = "";
+    const say = (lead, rest) => { note.appendChild(b(lead)); note.appendChild(document.createTextNode(" " + rest)); };
+    if (S.sol === "none") say("No grouping.", `Products sit wherever there was space, so every rack is a mix. On average a product is half-way down the aisle: about ${fmt(walk("none"), 1)} m for each pick.`);
+    if (S.sol === "kmeans") say("K-Means.", `${k} clear groups, one rack each, the most-picked group nearest the desk. About ${fmt(walk("kmeans"), 1)} m for each pick, against ${fmt(walk("none"), 1)} m with no grouping.`);
+    if (S.sol === "hier") say("Hierarchical clustering.", `The tree was cut into ${k} groups. ${sols.hier.same} of ${n} SKUs land in the same group as with K-Means. About ${fmt(walk("hier"), 1)} m for each pick. It compares every pair of SKUs, which gets slow for a big warehouse.`);
+    if (S.sol === "gmm") say("Mixture of Gaussians.", `Each SKU gets a probability for every group; here it is placed in its most likely one. ${sols.gmm.split} of ${n} SKUs are split between groups (highest probability under 90%). A shelf needs one answer, which is why we chose K-Means.`);
+    if (S.sol === "pca") say("PCA makes no groups.", "It only turns the four numbers into fewer numbers. There is nothing to arrange the shelves by, so they stay as they were. PCA can help before clustering, not instead of it.");
+    const table = $("compare"); table.textContent = "";
+    const head = h("tr", "", null, h("thead", "", null, table));
+    [["Solution", ""], ["Walk per pick", "num"], ["Groups", ""], ["What happens on the shelves", ""]].forEach(([t, c]) => { h("th", c, t, head).scope = "col"; });
+    const body = h("tbody", "", null, table);
+    [["none", "None", "Every rack is a mix of products."],
+     ["kmeans", `${k} clear groups`, "One rack per group; every SKU has exactly one place."],
+     ["hier", `${k} groups cut from a tree`, `${sols.hier.same} of ${n} SKUs are grouped as in K-Means.`],
+     ["gmm", `${k} soft groups`, `${sols.gmm.split} SKUs are split between groups; ${sols.gmm.same} of ${n} match K-Means.`],
+     ["pca", "No groups", "Nothing to arrange by; the shelves do not change."]].forEach(([key, groups, what]) => {
+      const tr = h("tr", key === S.sol ? "on" : "", null, body);
+      h("td", "", SOL_NAMES[key], tr); h("td", "num", key === "pca" ? "\u2013" : `${fmt(walk(key), 1)} m`, tr); h("td", "", groups, tr); h("td", "", what, tr);
+    });
+  }
+
+  function drawStatus() {
+    const main = $("status-main"), sub = $("status-sub");
+    if (!S.assign) { main.textContent = `Ready with ${S.k} random centres. Press Next round.`; sub.textContent = ""; }
+    else if (S.done) {
+      const err = errorOf(S.X, S.assign, S.cents), best = S.elbow[S.k - 1].error, rounds = `${S.round} round${S.round === 1 ? "" : "s"}`;
+      if (err > best * 1.15) {
+        main.textContent = `Finished after ${rounds}, but this start got stuck in a worse grouping.`;
+        sub.textContent = `Error ${fmt(err, 2)}; the best found for k = ${S.k} is ${fmt(best, 2)}. Press New starting centres and run again.`;
+      } else {
+        main.textContent = `Finished after ${rounds}: no SKU changed its cluster.`;
+        sub.textContent = `Error (within-cluster variance): ${fmt(err, 2)}`;
+      }
+    }
+    else { main.textContent = `Round ${S.round}: ${S.changed} SKU${S.changed === 1 ? "" : "s"} ${S.round === 1 ? "joined a cluster" : "changed cluster"}. Centres moved to the new averages.`; sub.textContent = `Error (within-cluster variance): ${fmt(errorOf(S.X, S.assign, S.cents), 2)}`; }
+    $("step").disabled = S.done;
+  }
+  function render() {
+    const sum = summary();
+    drawScatter(); drawLegend(sum); drawElbow(); drawTiles(sum); drawTable(sum); drawPlan(sum); drawStatus();
+  }
+
+  // ---- wiring --------------------------------------------------------------
+  for (const id of ["xf", "yf"]) {
+    const sel = $(id);
+    AXES.forEach((key) => { const o = h("option", "", label(key), sel); o.value = key; });
+    sel.value = S[id];
+    sel.addEventListener("change", () => { S[id] = sel.value; render(); });
+  }
+  document.querySelectorAll(".kseg").forEach((seg) => seg.addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-k]"); if (!b) return;
+    S.k = +b.dataset.k; S.sols = null;
+    document.querySelectorAll(".kseg button").forEach((x) => x.setAttribute("aria-pressed", String(+x.dataset.k === S.k)));
+    S.initSeed = showcaseStart(S.k);
+    restart(); drawShelves();
+  }));
+  $("sol-seg").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-sol]"); if (!b) return;
+    S.sol = b.dataset.sol;
+    [...$("sol-seg").children].forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    drawShelves();
+  });
+  $("step").addEventListener("click", () => { stopRun(); step(); });
+  $("run").addEventListener("click", toggleRun);
+  $("reset").addEventListener("click", () => { S.initSeed = 100 + (++S.tries); restart(); });
+  $("newdata").addEventListener("click", () => { S.seed++; newData(); });
+  newData();
+  window.__kmeansDemo = S; // for checking the page from the console
+})();
+</script>
+</body>
+</html>
