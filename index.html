@@ -106,6 +106,9 @@
   .steps b { display: block; color: var(--text-primary); }
   footer { margin: 28px 0 40px; color: var(--text-muted); font-size: 13.5px; }
   .empty { color: var(--text-muted); font-size: 14px; padding: 8px 0; }
+  summary { font-weight: 600; cursor: pointer; }
+  .about { margin: 10px 0 0; padding-left: 20px; color: var(--text-secondary); font-size: 14.5px; }
+  .about li { margin-bottom: 6px; }
   /* Shelves */
   :root { --shelf: #b08a5b; --iw: clamp(23px, 6.4vw, 30px); }
   @media (prefers-color-scheme: dark) { :root { --shelf: #8a6a45; } }
@@ -131,7 +134,7 @@
   <header>
     <p class="kicker">Machine Learning (21CSC305P) &middot; Project Review 3 &middot; Team Cash guard</p>
     <h1>Grouping warehouse products with K-Means clustering</h1>
-    <p class="lead">A warehouse holds thousands of products (SKUs). This demo groups similar SKUs with K-Means, one round at a time, and turns each group into a storage zone so that the most-picked products sit closest to packing.</p>
+    <p class="lead">Group similar products with K-Means, then give each group a storage zone.</p>
     <div class="links">
       <a class="btn primary" href="#demo">Try the demo</a>
       <a class="btn" href="slides/kmeans-sku-clustering.pptx" download>Slides (PPTX)</a>
@@ -142,7 +145,7 @@
 
   <section id="demo" class="card" aria-labelledby="demo-h">
     <h2 id="demo-h">Run K-Means yourself</h2>
-    <p class="sub">120 example SKUs, each described by four numbers: picks per week, season index, volume and a fragile flag. The data is made up in your browser; no real warehouse data is used.</p>
+    <p class="sub">120 example SKUs, made up in your browser.</p>
 
     <div class="controls">
       <div class="field"><span id="k-label">Number of clusters (k)</span>
@@ -171,28 +174,27 @@
 
     <div class="grid">
       <div>
-        <h3>Each mark is one SKU. Colour and shape show its cluster</h3>
+        <h3>SKUs by cluster</h3>
         <div class="chart" id="scatter-box">
           <svg id="scatter" viewBox="0 0 640 410" role="img" aria-label="Scatter plot of the example SKUs, coloured and shaped by cluster. The same information is in the table below."></svg>
           <div class="tip" id="tip" hidden></div>
         </div>
         <ul class="legend" id="legend" aria-label="Clusters"></ul>
-        <p class="note">The clusters are found using all four numbers. The picture can only show two of them at a time; change the axes to look from another side. Rings with a plus sign are the cluster centres (centroids).</p>
-        <p class="note">The first start for each k is picked to show the steps clearly. New starting centres is a plain random start, and K-Means can get stuck with a bad one. That is why it is normally run several times.</p>
+        <p class="note">Rings with a plus are the cluster centres.</p>
       </div>
       <div class="side">
         <div>
-          <h3>Elbow chart: error for each value of k</h3>
+          <h3>Elbow chart</h3>
           <div class="chart" id="elbow-box">
             <svg id="elbow" viewBox="0 0 400 250" role="img" aria-label="Line chart of within-cluster variance for k from 1 to 8. The error falls quickly up to the bend and slowly after it."></svg>
             <div class="tip" id="tip2" hidden></div>
           </div>
-          <p class="note">Error = within-cluster variance on the scaled data (best of 10 runs for each k). Pick the k where the curve bends.</p>
+          <p class="note">Pick k where the curve bends.</p>
         </div>
         <div>
-          <h3>Does grouping reduce walking?</h3>
+          <h3>Walk per pick</h3>
           <div class="tiles" id="tiles"></div>
-          <p class="note">A simple model, not a measurement: all 120 SKUs share one 40 m aisle that starts at packing, and the most-picked cluster takes the stretch nearest to it. With no grouping, a SKU is on average half-way down the aisle.</p>
+          <p class="note">A simple model, not a measurement.</p>
         </div>
       </div>
     </div>
@@ -200,7 +202,7 @@
 
   <section id="shelves" class="card" aria-labelledby="shelf-h">
     <h2 id="shelf-h">See it on the shelves</h2>
-    <p class="sub">The same 120 products on the racks of one aisle. Choose a solution from Unit 3 and watch the products move. The packing desk is on the left, so the first rack is the shortest walk.</p>
+    <p class="sub">Choose a solution and watch the products move. The packing desk is on the left.</p>
     <div class="controls">
       <div class="field"><span id="sol-label">Arrange the shelves with</span>
         <div class="seg wide" role="group" aria-labelledby="sol-label" id="sol-seg">
@@ -224,15 +226,14 @@
       <div class="aisle" id="aisle"></div>
       <div class="tip" id="tip3" hidden></div>
     </div>
-    <p class="note">Inside a rack, light products sit on the top shelves and big ones at the bottom. Product names and pictures are examples. Point at a product to see its numbers.</p>
+    <p class="note">Point at a product to see its numbers.</p>
     <h3 style="margin-top:16px">The solutions side by side</h3>
     <div class="scroll"><table id="compare"></table></div>
-    <p class="note">Walk per pick uses the same simple model as above: one 40 m aisle, the most-picked group nearest the desk, each group taking as much of the aisle as it has products. It is a model on example data, not a measurement.</p>
   </section>
 
   <section class="card" aria-labelledby="zones-h">
     <h2 id="zones-h">Clusters become zones</h2>
-    <p class="sub">Each cluster is read from its averages and given a place. The most-picked cluster goes nearest to packing.</p>
+    <p class="sub">The most-picked cluster goes nearest to packing.</p>
     <div class="scroll"><table id="table" aria-describedby="zones-h"></table></div>
     <h3 style="margin-top:16px">Example floor plan</h3>
     <div class="plan" id="plan"></div>
@@ -240,18 +241,31 @@
 
   <section class="card" aria-labelledby="how-h">
     <h2 id="how-h">How K-Means works</h2>
-    <p class="sub">Each press of Next round does steps 2 to 4 once.</p>
     <ol class="steps">
-      <li><b>Pick k centres</b>Choose k centroids at random to start.</li>
-      <li><b>Measure distance</b>Find the straight-line (Euclidean) distance from each SKU to every centroid.</li>
-      <li><b>Assign</b>Put each SKU in the cluster with the nearest centroid.</li>
-      <li><b>Update centres</b>Move each centroid to the mean of its SKUs.</li>
-      <li><b>Repeat</b>Do it again until no SKU changes its cluster.</li>
+      <li><b>Pick k centres</b>At random.</li>
+      <li><b>Measure distance</b>From each SKU to every centre.</li>
+      <li><b>Assign</b>Each SKU joins its nearest centre.</li>
+      <li><b>Update centres</b>Move each to the mean of its SKUs.</li>
+      <li><b>Repeat</b>Until no SKU changes cluster.</li>
     </ol>
   </section>
 
+  <section class="card">
+    <details>
+      <summary>About the numbers</summary>
+      <ul class="about">
+        <li>The data is made up in your browser. No real warehouse data is used, and product names and pictures are examples.</li>
+        <li>Clusters use all four numbers: picks per week, season index, volume and a fragile flag. The picture shows two at a time.</li>
+        <li>Error is the within-cluster variance on scaled data, the best of 10 runs for each k.</li>
+        <li>The first start for each k is picked to show the steps clearly. New starting centres is a plain random start, and can get stuck in a worse grouping.</li>
+        <li>Walk per pick is a simple model: one 40 m aisle from the packing desk, the most-picked group nearest, each group taking as much aisle as it has products. With no grouping a product is, on average, half-way down.</li>
+        <li>Inside a rack, light products are on the top shelves and big ones at the bottom.</li>
+      </ul>
+    </details>
+  </section>
+
   <footer>
-    <p>A student project for Machine Learning (21CSC305P), Unit 3. All numbers on this page come from example data generated in the browser. They show how the method works; they are not results from a real warehouse.</p>
+    <p>Student project, Machine Learning (21CSC305P), Unit 3. The numbers show the method, not a real warehouse.</p>
   </footer>
 </div>
 
@@ -657,10 +671,10 @@
   function drawTiles(sum) {
     const box = $("tiles"); box.textContent = "";
     const tile = (v, l) => { const t = h("div", "tile", null, box); h("div", "v", v, t); h("div", "l", l, t); };
-    if (!sum) { tile("–", "No grouping, per pick"); tile("–", "Grouped by cluster, per pick"); tile("–", "Less walking in this model"); return; }
-    tile(`${fmt(sum.random, 1)} m`, "No grouping, per pick");
-    tile(`${fmt(sum.grouped, 1)} m`, "Grouped by cluster, per pick");
-    tile(`${fmt(100 * (1 - sum.grouped / sum.random))}%`, "Less walking in this model");
+    if (!sum) { tile("–", "No grouping"); tile("–", "Grouped by cluster"); tile("–", "Less walking"); return; }
+    tile(`${fmt(sum.random, 1)} m`, "No grouping");
+    tile(`${fmt(sum.grouped, 1)} m`, "Grouped by cluster");
+    tile(`${fmt(100 * (1 - sum.grouped / sum.random))}%`, "Less walking");
   }
   function drawTable(sum) {
     const table = $("table"); table.textContent = "";
@@ -736,20 +750,20 @@
     const b = (text) => { const x = document.createElement("b"); x.textContent = text; return x; };
     note.textContent = "";
     const say = (lead, rest) => { note.appendChild(b(lead)); note.appendChild(document.createTextNode(" " + rest)); };
-    if (S.sol === "none") say("No grouping.", `Products sit wherever there was space, so every rack is a mix. On average a product is half-way down the aisle: about ${fmt(walk("none"), 1)} m for each pick.`);
-    if (S.sol === "kmeans") say("K-Means.", `${k} clear groups, one rack each, the most-picked group nearest the desk. About ${fmt(walk("kmeans"), 1)} m for each pick, against ${fmt(walk("none"), 1)} m with no grouping.`);
-    if (S.sol === "hier") say("Hierarchical clustering.", `The tree was cut into ${k} groups. ${sols.hier.same} of ${n} SKUs land in the same group as with K-Means. About ${fmt(walk("hier"), 1)} m for each pick. It compares every pair of SKUs, which gets slow for a big warehouse.`);
-    if (S.sol === "gmm") say("Mixture of Gaussians.", `Each SKU gets a probability for every group; here it is placed in its most likely one. ${sols.gmm.split} of ${n} SKUs are split between groups (highest probability under 90%). A shelf needs one answer, which is why we chose K-Means.`);
-    if (S.sol === "pca") say("PCA makes no groups.", "It only turns the four numbers into fewer numbers. There is nothing to arrange the shelves by, so they stay as they were. PCA can help before clustering, not instead of it.");
+    if (S.sol === "none") say("No grouping.", `Every rack is a mix. About ${fmt(walk("none"), 1)} m per pick.`);
+    if (S.sol === "kmeans") say("K-Means.", `${k} groups, one rack each. About ${fmt(walk("kmeans"), 1)} m per pick.`);
+    if (S.sol === "hier") say("Hierarchical.", `${sols.hier.same} of ${n} SKUs grouped as in K-Means. About ${fmt(walk("hier"), 1)} m per pick. Slow for a big warehouse.`);
+    if (S.sol === "gmm") say("Gaussian mixture.", `${sols.gmm.split} of ${n} SKUs are split between groups. About ${fmt(walk("gmm"), 1)} m per pick. A shelf needs one answer.`);
+    if (S.sol === "pca") say("PCA makes no groups.", "Nothing to arrange by, so the shelves stay as they were.");
     const table = $("compare"); table.textContent = "";
     const head = h("tr", "", null, h("thead", "", null, table));
-    [["Solution", ""], ["Walk per pick", "num"], ["Groups", ""], ["What happens on the shelves", ""]].forEach(([t, c]) => { h("th", c, t, head).scope = "col"; });
+    [["Solution", ""], ["Walk per pick", "num"], ["Groups", ""], ["On the shelves", ""]].forEach(([t, c]) => { h("th", c, t, head).scope = "col"; });
     const body = h("tbody", "", null, table);
-    [["none", "None", "Every rack is a mix of products."],
-     ["kmeans", `${k} clear groups`, "One rack per group; every SKU has exactly one place."],
-     ["hier", `${k} groups cut from a tree`, `${sols.hier.same} of ${n} SKUs are grouped as in K-Means.`],
-     ["gmm", `${k} soft groups`, `${sols.gmm.split} SKUs are split between groups; ${sols.gmm.same} of ${n} match K-Means.`],
-     ["pca", "No groups", "Nothing to arrange by; the shelves do not change."]].forEach(([key, groups, what]) => {
+    [["none", "None", "Every rack is a mix."],
+     ["kmeans", `${k} clear groups`, "One rack per group."],
+     ["hier", `${k} from a tree`, `${sols.hier.same} of ${n} SKUs as in K-Means.`],
+     ["gmm", `${k} soft groups`, `${sols.gmm.split} SKUs split between groups.`],
+     ["pca", "No groups", "Shelves do not change."]].forEach(([key, groups, what]) => {
       const tr = h("tr", key === S.sol ? "on" : "", null, body);
       h("td", "", SOL_NAMES[key], tr); h("td", "num", key === "pca" ? "\u2013" : `${fmt(walk(key), 1)} m`, tr); h("td", "", groups, tr); h("td", "", what, tr);
     });
@@ -757,18 +771,18 @@
 
   function drawStatus() {
     const main = $("status-main"), sub = $("status-sub");
-    if (!S.assign) { main.textContent = `Ready with ${S.k} random centres. Press Next round.`; sub.textContent = ""; }
+    if (!S.assign) { main.textContent = "Ready. Press Next round."; sub.textContent = ""; }
     else if (S.done) {
       const err = errorOf(S.X, S.assign, S.cents), best = S.elbow[S.k - 1].error, rounds = `${S.round} round${S.round === 1 ? "" : "s"}`;
       if (err > best * 1.15) {
-        main.textContent = `Finished after ${rounds}, but this start got stuck in a worse grouping.`;
-        sub.textContent = `Error ${fmt(err, 2)}; the best found for k = ${S.k} is ${fmt(best, 2)}. Press New starting centres and run again.`;
+        main.textContent = `Done in ${rounds}, but stuck in a worse grouping.`;
+        sub.textContent = `Error ${fmt(err, 2)}; best for k = ${S.k} is ${fmt(best, 2)}. Try New starting centres.`;
       } else {
-        main.textContent = `Finished after ${rounds}: no SKU changed its cluster.`;
-        sub.textContent = `Error (within-cluster variance): ${fmt(err, 2)}`;
+        main.textContent = `Done in ${rounds}.`;
+        sub.textContent = `Error: ${fmt(err, 2)}`;
       }
     }
-    else { main.textContent = `Round ${S.round}: ${S.changed} SKU${S.changed === 1 ? "" : "s"} ${S.round === 1 ? "joined a cluster" : "changed cluster"}. Centres moved to the new averages.`; sub.textContent = `Error (within-cluster variance): ${fmt(errorOf(S.X, S.assign, S.cents), 2)}`; }
+    else { main.textContent = `Round ${S.round}: ${S.changed} SKU${S.changed === 1 ? "" : "s"} ${S.round === 1 ? "joined a cluster" : "changed cluster"}.`; sub.textContent = `Error: ${fmt(errorOf(S.X, S.assign, S.cents), 2)}`; }
     $("step").disabled = S.done;
   }
   function render() {
