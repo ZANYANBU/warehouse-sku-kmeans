@@ -2,7 +2,7 @@
 
 **Brazilian E-Commerce Public Dataset by Olist**
 
-- Source: https://github.com/olist/work-at-olist-data (folder `datasets/`)
+- Source, to open in a browser: https://github.com/olist/work-at-olist-data/tree/master/datasets
 - Licence: MIT
 - What it is: 99,441 real orders placed on the Olist marketplace in Brazil between September 2016 and October 2018, with 112,650 order lines for 32,951 products. Customers and sellers are anonymised, and products have a category but no name.
 
@@ -15,7 +15,12 @@
 | `olist_products_dataset.csv` | 2.4 MB | weight and size of each product (`product_weight_g`, `product_length_cm`, `product_height_cm`, `product_width_cm`) |
 | `product_category_name_translation.csv` | 3 KB | category names in English |
 
-The raw files are not copied into this repository. The notebook downloads them from the source each time it runs.
+The raw files are not copied into this repository. The notebook downloads them from the source each time it runs, from addresses of this form:
+
+    https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/<file name>
+
+That address without a file name is not a page and answers 404; each full file address works. For example:
+https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/olist_products_dataset.csv
 
 ## What is in this folder
 
