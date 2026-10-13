@@ -278,6 +278,11 @@ pres.addSection({ title: "Applying K-Means" });
     { text: "Season index ", options: { bold: true, color: C.text2 } },
     { text: "= share of orders in the busiest month x 12" },
   ], { x: 0.68, y: 4.08, w: 4.95, h: 0.68, valign: "middle" });
+  text(s, [
+    { text: "Source: " },
+    { text: "github.com/olist/work-at-olist-data", options: { bold: true, color: C.text2, hyperlink: { url: "https://github.com/olist/work-at-olist-data", tooltip: "Brazilian E-Commerce Public Dataset by Olist" } } },
+    { text: "  (Olist, MIT licence)" },
+  ], { x: 0.5, y: 4.82, w: 5.3, h: 0.28, fontSize: 11, color: C.accent5, valign: "middle" });
   const pts = [
     ["383 real SKUs", "Products ordered at least 30 times, out of 32,951."],
     ["Four numbers each", "Orders, season index, volume, and weight for handling."],

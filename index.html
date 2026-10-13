@@ -88,6 +88,7 @@
   .tile .v { font-size: 22px; font-weight: 700; line-height: 1.2; }
   .tile .l { font-size: 12.5px; color: var(--text-secondary); }
   .note { font-size: 13px; color: var(--text-muted); margin: 10px 0 0; }
+  .note a { color: var(--accent); }
   .scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 640px; }
   th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -154,7 +155,7 @@
     </div>
     <div class="tiles" id="real-tiles" style="margin-top:14px"></div>
     <div class="scroll" style="margin-top:12px"><table id="real-table"></table></div>
-    <p class="note">Orders, sizes and weights are real. Walk per pick is a simple model.</p>
+    <p class="note">Source: <a href="https://github.com/olist/work-at-olist-data">Brazilian E-Commerce Public Dataset by Olist</a> (MIT licence). <a href="https://github.com/ZANYANBU/warehouse-sku-kmeans/blob/main/data/SOURCE.md">How we used it</a>. Walk per pick is a simple model.</p>
   </section>
 
   <section id="demo" class="card" aria-labelledby="demo-h">

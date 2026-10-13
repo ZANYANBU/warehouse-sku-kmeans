@@ -52,6 +52,7 @@ Everything runs in the browser from one file, `index.html`. There is nothing to 
 | `slides/kmeans-sku-clustering.pptx` | The 12-slide presentation |
 | `script/presentation-script.pdf` | The presentation script: 4 speakers, 3 slides each, with simple examples and terms |
 | `notebook/warehouse_sku_kmeans.ipynb` | The Colab notebook: live data, features, elbow, K-Means, zones |
+| `data/SOURCE.md` | Where the data comes from, which files are read and how each number is built |
 | `data/sku_features.csv` | The 383 real SKUs with their four numbers and cluster |
 | `data/results.json` | The real-data results the page shows |
 | `source/build_deck.js` | The script that generated the slides (needs `pptxgenjs`) |
