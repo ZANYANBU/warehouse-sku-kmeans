@@ -326,29 +326,14 @@ pres.addSection({ title: "Applying K-Means" });
     text(s, v, { x: x + 0.2, y: 1.36, w: 2.5, h: 0.5, fontSize: 26, bold: true, color: C.text2, valign: "middle" });
     text(s, l, { x: x + 0.2, y: 1.84, w: 2.5, h: 0.32, fontSize: 12, color: C.accent5, valign: "middle" });
   });
-  s.addChart(pres.charts.BAR, [{ name: "Orders", labels: G.months_all, values: G.orders_all }], axes({
-    x: 0.5, y: 2.4, w: 9.0, h: 2.6, barDir: "col", chartColors: ["2A78D6"], barGapWidthPct: 40,
-    showTitle: true, title: "Orders placed in each month", titleFontSize: 12, titleColor: "0F4C5C",
-    catAxisLabelFontSize: 9, catAxisLabelRotate: 270, valAxisLabelFormatCode: "#,##0", objectName: "Orders by month",
-  }));
+  s.addImage({ path: __dirname + "/charts/orders_by_month.png", x: 0.5, y: 2.4, w: 9.0, h: 2.6, altText: "Bar graph of orders placed in each month, rising through 2017 and highest in November 2017", objectName: "Orders by month" });
 }
 
 // ---- 9. Choose k -----------------------------------------------------------
 {
   const s = content("Applying K-Means", "Step 2: Choose the value of k",
     "K-Means needs k before it starts. We used the elbow method from Unit 3 on the real data. We ran K-Means for k from 1 to 8 and plotted the within-cluster variance. The error falls by 33, 25 and 22 percent up to k equal to 4, and then only by 15 percent. So the bend is at 4, and we use 4 clusters.");
-  s.addChart(pres.charts.LINE, [{ name: "Within-cluster variance", labels: ["1", "2", "3", "4", "5", "6", "7", "8"], values: ELBOW }], {
-    x: 0.5, y: 1.3, w: 5.2, h: 3.55,
-    showTitle: true, title: "Elbow curve on the real data (383 SKUs)", titleFontSize: 12, titleColor: HEX.dk2, titleFontFace: "+mn-lt",
-    chartColors: [HEX.accent2], lineSize: 3, lineDataSymbol: "circle", lineDataSymbolSize: 8,
-    showLegend: false, showValue: false,
-    showCatAxisTitle: true, catAxisTitle: "Number of clusters (k)", catAxisTitleFontSize: 11, catAxisTitleColor: HEX.accent5, catAxisTitleFontFace: "+mn-lt",
-    showValAxisTitle: true, valAxisTitle: "Within-cluster variance", valAxisTitleFontSize: 11, valAxisTitleColor: HEX.accent5, valAxisTitleFontFace: "+mn-lt",
-    catAxisLabelColor: HEX.accent5, valAxisLabelColor: HEX.accent5, catAxisLabelFontSize: 11, valAxisLabelFontSize: 11,
-    catAxisLabelFontFace: "+mn-lt", valAxisLabelFontFace: "+mn-lt",
-    valGridLine: { color: HEX.lt2, size: 0.75 }, catGridLine: { style: "none" }, valAxisMinVal: 0,
-    objectName: "Elbow chart",
-  });
+  s.addImage({ path: __dirname + "/charts/elbow.png", x: 0.5, y: 1.3, w: 5.2, h: 3.55, altText: "Elbow curve: within-cluster variance for k from 1 to 8, bending at k equal to 4", objectName: "Elbow chart" });
   const pts = [
     ["Try many values", "Run K-Means for k = 1 to 8. Note the error each time."],
     ["Plot the curve", "Error = within-cluster variance. It falls as k grows."],
@@ -368,13 +353,7 @@ pres.addSection({ title: "Applying K-Means" });
   const s = content("Applying K-Means", "A second check: silhouette",
     "The elbow gave k equal to 4. We checked it a second way with the silhouette score. It tells how well each SKU sits inside its own group, and higher is better. The score is highest at k equal to 4, at 0.37. So both checks agree, and we use 4 clusters.");
   const ks = Object.keys(G.silhouette);
-  s.addChart(pres.charts.BAR, [{ name: "Silhouette score", labels: ks, values: ks.map((k) => G.silhouette[k]) }], axes({
-    x: 0.5, y: 1.3, w: 5.2, h: 3.55, barDir: "col", chartColors: ks.map((k) => (k === "4" ? "EDA100" : "9BBBE4")), barGapWidthPct: 45,
-    showTitle: true, title: "Silhouette score for each k (real data)", titleFontSize: 12, titleColor: "0F4C5C",
-    showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: "0.00", dataLabelFontSize: 11, dataLabelColor: "16212B",
-    showCatAxisTitle: true, catAxisTitle: "Number of clusters (k)", catAxisTitleFontSize: 11, catAxisTitleColor: "5F7180", catAxisTitleFontFace: "+mn-lt",
-    valAxisMinVal: 0, valAxisMaxVal: 0.45, valAxisLabelFormatCode: "0.00", objectName: "Silhouette chart",
-  }));
+  s.addImage({ path: __dirname + "/charts/silhouette.png", x: 0.5, y: 1.3, w: 5.2, h: 3.55, altText: "Bar graph of the silhouette score for k from 2 to 8, highest at k equal to 4", objectName: "Silhouette chart" });
   const pts = [
     ["What it measures", "How well each SKU sits inside its own group. Higher is better."],
     ["Highest at k = 4", "The score is 0.37 at k = 4, above every other k."],
@@ -458,20 +437,7 @@ pres.addSection({ title: "Applying K-Means" });
 {
   const s = content("Applying K-Means", "What each cluster looks like",
     "These four graphs show the average of each number for each cluster. Cluster A is ordered the most, about 160 times. Cluster B is the biggest and the heaviest. Cluster C has the highest season index. Cluster D is small and steady. This is how we gave the clusters their names.");
-  const charts = [
-    ["Average orders", [160, 52, 48, 45], "0"],
-    ["Season index", [2.6, 3.5, 7.4, 3.2], "0.0"],
-    ["Average volume (L)", [9.2, 47.1, 12.9, 5.1], "0.0"],
-    ["Average weight (kg)", [1.1, 7.6, 1.1, 0.6], "0.0"],
-  ];
-  charts.forEach(([title, values, fmtCode], i) => {
-    s.addChart(pres.charts.BAR, [{ name: title, labels: ["A", "B", "C", "D"], values }], axes({
-      x: 0.5 + i * 2.27, y: 1.3, w: 2.2, h: 2.75, barDir: "col", chartColors: [ZC.A, ZC.B, ZC.C, ZC.D], barGapWidthPct: 45,
-      showTitle: true, title, titleFontSize: 12, titleColor: "0F4C5C",
-      showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: fmtCode, dataLabelFontSize: 11, dataLabelColor: "16212B",
-      valAxisHidden: true, valAxisMinVal: 0, valGridLine: { style: "none" }, objectName: title,
-    }));
-  });
+  s.addImage({ path: __dirname + "/charts/cluster_averages.png", x: 0.5, y: 1.3, w: 9.0, h: 2.75, altText: "Four bar graphs: average orders, season index, volume and weight for clusters A, B, C and D", objectName: "Cluster averages" });
   legendRow(s, 0.5, 4.12, 9.0);
   card(s, 0.5, 4.5, 9.0, 0.45);
   text(s, "A is picked the most. B is the biggest and heaviest. C sells in one season. D is small and steady.",
@@ -482,15 +448,7 @@ pres.addSection({ title: "Applying K-Means" });
 {
   const s = content("Applying K-Means", "Seasonal against fast mover",
     "Here are two real products, month by month. The pink line is the most ordered SKU of the seasonal cluster. Of its 114 orders, 76 came in one month, January 2018. The blue line is the most ordered fast mover. It has 527 orders, spread over many months. That is the difference between the two clusters.");
-  s.addChart(pres.charts.LINE, [
-    { name: "Seasonal SKU (114 orders)", labels: G.months, values: G.seasonal },
-    { name: "Fast mover (527 orders)", labels: G.months, values: G.fast },
-  ], axes({
-    x: 0.5, y: 1.3, w: 6.0, h: 3.55, chartColors: [ZC.C, ZC.A], lineSize: 3, lineDataSymbol: "circle", lineDataSymbolSize: 7,
-    showTitle: true, title: "Orders in each month, two real SKUs", titleFontSize: 12, titleColor: "0F4C5C",
-    showLegend: true, legendPos: "b", legendFontSize: 11, legendFontFace: "+mn-lt", legendColor: "16212B",
-    catAxisLabelFontSize: 9, catAxisLabelRotate: 270, valAxisMinVal: 0, objectName: "Seasonal against fast mover",
-  }));
+  s.addImage({ path: __dirname + "/charts/seasonal_fast.png", x: 0.5, y: 1.3, w: 6.0, h: 3.55, altText: "Line graph of monthly orders for one seasonal SKU and one fast mover", objectName: "Seasonal against fast mover" });
   const pts = [
     ["Seasonal SKU", "76 of its 114 orders came in a single month, January 2018."],
     ["Fast mover", "527 orders, with 40 or more in seven different months."],
@@ -540,12 +498,7 @@ pres.addSection({ title: "Conclusion" });
       { shape: S.rect, x, y: 1.62, w: w - 0.03, h: 0.8, fill: { color: ZC[z] }, line: { color: "FFFFFF", width: 1 }, color: ZFG[z], align: "center", valign: "middle", margin: 0, objectName: name("Zone") });
   });
   legendRow(s, 0.5, 2.5, 9.0);
-  s.addChart(pres.charts.BAR, [{ name: "Walk per pick (m)", labels: ["K-Means zones", "No grouping"], values: [46.5, 63.8] }], axes({
-    x: 0.5, y: 2.95, w: 5.9, h: 1.95, barDir: "bar", chartColors: ["008300", "9BBBE4"], barGapWidthPct: 45,
-    showTitle: true, title: "Walk per pick in the model (metres)", titleFontSize: 12, titleColor: "0F4C5C",
-    showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: '0.0" m"', dataLabelFontSize: 12, dataLabelColor: "16212B",
-    valAxisMinVal: 0, valAxisMaxVal: 80, valAxisLabelFormatCode: "0", objectName: "Walk per pick",
-  }));
+  s.addImage({ path: __dirname + "/charts/walk_per_pick.png", x: 0.5, y: 2.95, w: 5.9, h: 1.95, altText: "Bar graph: walk per pick is 63.8 metres with no grouping and 46.5 metres with K-Means zones", objectName: "Walk per pick" });
   card(s, 6.7, 2.95, 2.8, 1.95, C.accent1);
   text(s, "27%", { x: 6.7, y: 3.05, w: 2.8, h: 0.85, fontSize: 44, bold: true, color: C.background1, align: "center", valign: "middle" });
   text(s, "less walking per pick", { x: 6.7, y: 3.88, w: 2.8, h: 0.35, fontSize: 14, color: C.background1, align: "center", valign: "middle" });
