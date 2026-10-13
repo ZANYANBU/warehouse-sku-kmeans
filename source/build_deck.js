@@ -26,6 +26,7 @@ const S = pres.ShapeType;
 const HEX = THEME.colors;
 
 const FOOT = "Warehouse SKU clustering  |  Project Review 3";
+const ELBOW = [1532.0, 1025.2, 772.5, 600.1, 511.0, 453.9, 410.9, 368.2];   // within-cluster variance, k = 1..8, real data
 
 // ---- layouts ---------------------------------------------------------------
 const dot = (x, y, d, color) => ({ text: { text: "", options: { shape: S.ellipse, x, y, w: d, h: d, fill: { color }, line: { color } } } });
@@ -257,30 +258,30 @@ pres.addSection({ title: "Applying K-Means" });
 // ---- 8. Prepare the data ---------------------------------------------------
 {
   const s = content("Applying K-Means", "Step 1: Prepare the SKU data",
-    "First we turn every SKU into a row of numbers. The table is made-up example data, only to show the idea. Handling needs become 0 or 1 flags. Then we scale the columns, because K-Means uses distance and a large number like volume would otherwise dominate.");
-  text(s, "Example data (made up to show the idea)", { x: 0.5, y: 1.22, w: 5.3, h: 0.28, fontSize: 11, color: C.accent5, valign: "middle" });
+    "We used real data: the public e-commerce dataset from Olist, with about ninety-nine thousand orders from 2016 to 2018. We kept the 383 products that were ordered at least 30 times. Each SKU becomes a row of four numbers: orders, season index, volume and weight. Weight stands for handling needs, because the dataset has no handling field. Orders, volume and weight are very uneven, so we take their log, and then bring every column to the same scale.");
+  text(s, "Real data: Olist public e-commerce dataset, 99,441 orders (2016 to 2018)", { x: 0.5, y: 1.22, w: 5.3, h: 0.28, fontSize: 11, color: C.accent5, valign: "middle" });
   const head = (t) => ({ text: t, options: { bold: true, color: C.background1, fill: { color: C.accent1 }, align: "center" } });
   const num = (t) => ({ text: t, options: { align: "center" } });
   s.addTable([
-    [head("SKU"), head("Picks / week"), head("Season index"), head("Volume (L)"), head("Fragile")],
-    ["A101", num("120"), num("1.1"), num("2"), num("0")],
-    ["B205", num("8"), num("3.5"), num("15"), num("0")],
-    ["C310", num("15"), num("1.0"), num("180"), num("0")],
-    ["D412", num("60"), num("1.2"), num("4"), num("1")],
+    [head("SKU"), head("Orders"), head("Season index"), head("Volume (L)"), head("Weight (kg)")],
+    ["aca2eb7d", num("527"), num("2.8"), num("15.0"), num("2.6")],
+    ["42a2c92a", num("183"), num("4.8"), num("33.0"), num("7.0")],
+    ["54d9ac71", num("114"), num("8.0"), num("7.8"), num("1.9")],
+    ["dbb67791", num("88"), num("4.5"), num("2.7"), num("0.2")],
   ], {
-    x: 0.5, y: 1.55, w: 5.3, colW: [0.8, 1.15, 1.2, 1.15, 1.0], rowH: [0.62, 0.42, 0.42, 0.42, 0.42],
+    x: 0.5, y: 1.55, w: 5.3, colW: [1.2, 0.9, 1.1, 1.05, 1.05], rowH: [0.62, 0.42, 0.42, 0.42, 0.42],
     fontSize: 14, color: C.text1, valign: "middle", margin: [0.03, 0.08, 0.03, 0.08],
-    border: { type: "solid", pt: 0.75, color: HEX.lt2 }, objectName: "Example SKU table",
+    border: { type: "solid", pt: 0.75, color: HEX.lt2 }, objectName: "Real SKU table",
   });
   card(s, 0.5, 4.08, 5.3, 0.68);
   text(s, [
     { text: "Season index ", options: { bold: true, color: C.text2 } },
-    { text: "= peak-season sales divided by average sales" },
+    { text: "= share of orders in the busiest month x 12" },
   ], { x: 0.68, y: 4.08, w: 4.95, h: 0.68, valign: "middle" });
   const pts = [
-    ["One row per SKU", "Each product becomes a row of numbers (a vector)."],
-    ["Everything as numbers", "Handling needs become 0 / 1 flags such as fragile or heavy."],
-    ["Scale the features", "Bring all columns to the same range so big numbers do not dominate."],
+    ["383 real SKUs", "Products ordered at least 30 times, out of 32,951."],
+    ["Four numbers each", "Orders, season index, volume, and weight for handling."],
+    ["Scale the features", "Log of the uneven columns, then all on the same scale."],
   ];
   pts.forEach(([t, d], i) => {
     const y = 1.3 + i * 1.17;
@@ -293,10 +294,10 @@ pres.addSection({ title: "Applying K-Means" });
 // ---- 9. Choose k -----------------------------------------------------------
 {
   const s = content("Applying K-Means", "Step 2: Choose the value of k",
-    "K-Means needs k before it starts. We use the elbow method from Unit 3. Run K-Means for many values of k and plot the within-cluster variance. The curve falls fast and then flattens. The bend is the best k. The curve shown is an illustration, where the bend is at k equal to 4.");
-  s.addChart(pres.charts.LINE, [{ name: "Within-cluster variance", labels: ["1", "2", "3", "4", "5", "6", "7", "8"], values: [100, 62, 38, 24, 20, 18, 16.5, 15.5] }], {
+    "K-Means needs k before it starts. We used the elbow method from Unit 3 on the real data. We ran K-Means for k from 1 to 8 and plotted the within-cluster variance. The error falls by 33, 25 and 22 percent up to k equal to 4, and then only by 15 percent. So the bend is at 4, and we use 4 clusters.");
+  s.addChart(pres.charts.LINE, [{ name: "Within-cluster variance", labels: ["1", "2", "3", "4", "5", "6", "7", "8"], values: ELBOW }], {
     x: 0.5, y: 1.3, w: 5.2, h: 3.55,
-    showTitle: true, title: "Example elbow curve (illustrative)", titleFontSize: 12, titleColor: HEX.dk2, titleFontFace: "+mn-lt",
+    showTitle: true, title: "Elbow curve on the real data (383 SKUs)", titleFontSize: 12, titleColor: HEX.dk2, titleFontFace: "+mn-lt",
     chartColors: [HEX.accent2], lineSize: 3, lineDataSymbol: "circle", lineDataSymbolSize: 8,
     showLegend: false, showValue: false,
     showCatAxisTitle: true, catAxisTitle: "Number of clusters (k)", catAxisTitleFontSize: 11, catAxisTitleColor: HEX.accent5, catAxisTitleFontFace: "+mn-lt",
@@ -307,9 +308,9 @@ pres.addSection({ title: "Applying K-Means" });
     objectName: "Elbow chart",
   });
   const pts = [
-    ["Try many values", "Run K-Means for k = 1, 2, 3 and so on. Note the error each time."],
+    ["Try many values", "Run K-Means for k = 1 to 8. Note the error each time."],
     ["Plot the curve", "Error = within-cluster variance. It falls as k grows."],
-    ["Find the elbow", "Pick the k where the curve bends. More clusters after it help very little."],
+    ["Find the elbow", "The error falls 22% at k = 4, then only 15% at k = 5."],
   ];
   pts.forEach(([t, d], i) => {
     const y = 1.3 + i * 1.03;
@@ -317,36 +318,34 @@ pres.addSection({ title: "Applying K-Means" });
     text(s, t, { x: 6.52, y, w: 2.98, h: 0.34, bold: true, fontSize: 15, color: C.text2, valign: "middle" });
     text(s, d, { x: 6.52, y: y + 0.36, w: 2.98, h: 0.62 });
   });
-  s.addText("In this example: k = 4", { shape: S.roundRect, rectRadius: 0.15, x: 6.0, y: 4.42, w: 3.5, h: 0.43, fill: { color: C.accent2 }, line: { color: C.accent2, width: 0 }, color: C.text1, bold: true, fontSize: 15, align: "center", valign: "middle", margin: 0, objectName: name("Pill") });
+  s.addText("On the real data: k = 4", { shape: S.roundRect, rectRadius: 0.15, x: 6.0, y: 4.42, w: 3.5, h: 0.43, fill: { color: C.accent2 }, line: { color: C.accent2, width: 0 }, color: C.text1, bold: true, fontSize: 15, align: "center", valign: "middle", margin: 0, objectName: name("Pill") });
 }
 
 // ---- 10. Clusters become zones ---------------------------------------------
 {
   const s = content("Applying K-Means", "Step 3: Clusters become zones",
-    "After K-Means runs, each cluster is a group of similar SKUs. The manager gives each cluster a zone. Fast movers go closest to packing. Seasonal items go to a flexible zone. Bulky items stay at ground level near the dock. Fragile items get a protected area. These four clusters are an example.");
+    "These are the four clusters K-Means found in the real data. Fast movers: 76 SKUs, ordered about 160 times each, so they go closest to packing. Bulky and heavy: 84 SKUs, about 47 litres and 7.6 kilos, kept at ground level. Seasonal: 25 SKUs whose orders bunch into one month, kept in a flexible zone. Regular small items: 198 SKUs, on the back racks.");
   const head = (t) => ({ text: t, options: { bold: true, color: C.background1, fill: { color: C.accent1 } } });
   const b = (t) => ({ text: t, options: { bold: true, color: C.text2 } });
   s.addTable([
     [head("Cluster"), head("SKUs in it"), head("Where to place")],
-    [b("1  Fast movers"), "Picked very often, small", "Front racks, near packing"],
-    [b("2  Seasonal"), "Sell fast in some months", "Flexible zone, moved forward in season"],
-    [b("3  Bulky / heavy"), "Large or heavy items", "Ground level, near loading dock"],
-    [b("4  Special care"), "Fragile items", "Separate protected area"],
+    [b("A  Fast movers"), "76 SKUs, about 160 orders each", "Front racks, near packing"],
+    [b("B  Bulky / heavy"), "84 SKUs, about 47 L and 7.6 kg", "Ground level, low racks"],
+    [b("C  Seasonal"), "25 SKUs, season index 7.4", "Flexible zone, moved forward in season"],
+    [b("D  Regular small"), "198 SKUs, about 45 orders each", "Back racks"],
   ], {
-    x: 0.5, y: 1.3, w: 5.6, colW: [1.65, 1.9, 2.05], rowH: [0.45, 0.68, 0.68, 0.68, 0.68],
+    x: 0.5, y: 1.3, w: 5.6, colW: [1.65, 1.95, 2.0], rowH: [0.45, 0.68, 0.68, 0.68, 0.68],
     fontSize: 14, color: C.text1, valign: "middle", margin: [0.04, 0.1, 0.04, 0.1],
     border: { type: "solid", pt: 0.75, color: HEX.lt2 }, objectName: "Cluster to zone table",
   });
-  text(s, "Example clusters. The real clusters come from the data.", { x: 0.5, y: 4.58, w: 5.6, h: 0.3, fontSize: 11, color: C.accent5, valign: "middle" });
-  // Example floor plan
+  text(s, "Real clusters: K-Means with k = 4 on 383 Olist SKUs.", { x: 0.5, y: 4.58, w: 5.6, h: 0.3, fontSize: 11, color: C.accent5, valign: "middle" });
   card(s, 6.4, 1.3, 3.1, 3.55);
-  text(s, "Example floor plan", { x: 6.55, y: 1.38, w: 1.6, h: 0.28, fontSize: 11, bold: true, color: C.text2, valign: "middle" });
-  text(s, "Loading dock", { x: 8.0, y: 1.38, w: 1.35, h: 0.28, fontSize: 11, color: C.accent5, align: "right", valign: "middle" });
+  text(s, "Floor plan", { x: 6.55, y: 1.38, w: 2.8, h: 0.28, fontSize: 11, bold: true, color: C.text2, valign: "middle" });
   const zones = [
-    [6.55, 1.72, "2", "Seasonal", C.accent4, C.text1],
-    [8.05, 1.72, "3", "Bulky / heavy", C.accent5, C.background1],
-    [6.55, 2.92, "1", "Fast movers", C.accent2, C.text1],
-    [8.05, 2.92, "4", "Special care", C.accent6, C.background1],
+    [6.55, 1.72, "C", "Seasonal", C.accent4, C.text1],
+    [8.05, 1.72, "D", "Regular small", C.accent5, C.background1],
+    [6.55, 2.92, "A", "Fast movers", C.accent2, C.text1],
+    [8.05, 2.92, "B", "Bulky / heavy", C.accent6, C.background1],
   ];
   zones.forEach(([x, y, num, label, fill, fg]) => {
     s.addText([
@@ -361,11 +360,11 @@ pres.addSection({ title: "Applying K-Means" });
 pres.addSection({ title: "Conclusion" });
 {
   const s = content("Conclusion", "How this solves our problem",
-    "Link back to the problem statement. The goal was better placement and less travel time. Fast movers near packing means less walking. Similar products together means better placement. And when demand changes with the season, we simply run K-Means again.");
+    "Link back to the problem statement. Fast movers sit closest to packing. In our simple one-aisle model the walk per pick falls from about 64 metres to about 47 metres, which is 27 percent less. Say clearly that this is a model, not a measurement. Bulky and heavy products get their own ground-level zone, and seasonal products are one group that is easy to move forward in season.");
   const wins = [
-    ["Less walking", "Fast movers sit closest to packing, so pickers travel less for most orders.", C.accent2],
-    ["Better placement", "Each zone holds products with similar size and handling needs.", C.accent3],
-    ["Season ready", "Re-run K-Means with new sales data and the zones update.", C.accent6],
+    ["Less walking", "Fast movers sit closest to packing. In our simple model, walk per pick falls by 27%.", C.accent2],
+    ["Better placement", "Bulky and heavy products get their own ground-level zone.", C.accent3],
+    ["Season ready", "Seasonal products are one group, easy to move forward in season.", C.accent6],
   ];
   wins.forEach(([t, d, col], i) => {
     const x = 0.5 + i * 3.07;
@@ -377,7 +376,7 @@ pres.addSection({ title: "Conclusion" });
   card(s, 0.5, 3.92, 9.0, 0.9);
   text(s, [
     { text: "How we check the clusters: ", options: { bold: true, color: C.text2 } },
-    { text: "SKUs inside a cluster should look alike (low within-cluster variance), and each centroid should read like a typical product." },
+    { text: "each centroid should read like a typical product. Fast movers: about 160 orders, 9 litres, 1 kg. The walking figure is a model, not a measurement." },
   ], { x: 0.7, y: 3.92, w: 8.6, h: 0.9, valign: "middle" });
 }
 
@@ -388,21 +387,24 @@ pres.addSection({ title: "Conclusion" });
   const lines = [
     "Problem: group warehouse SKUs so that pickers travel less.",
     "Chosen from Unit 3: K-Means clustering, a simple partitioning method.",
-    "Outcome: clear clusters that map directly to warehouse zones.",
+    "Tested on real data: 383 SKUs gave 4 clear clusters that map to zones.",
   ];
   lines.forEach((l, i) => {
     const y = 1.5 + i * 0.9;
     badge(s, i + 1, 0.6, y + 0.1, 0.42);
     text(s, l, { x: 1.2, y, w: 4.9, h: 0.62, fontSize: 16, color: C.background1, valign: "middle" });
   });
-  text(s, "Next step: test with real SKU data and compare different values of k.", { x: 0.6, y: 4.3, w: 5.5, h: 0.5, color: C.background2, valign: "middle" });
+  text(s, [
+    { text: "Live demo and Colab code:", options: { breakLine: true } },
+    { text: "zanyanbu.github.io/warehouse-sku-kmeans", options: { bold: true } },
+  ], { x: 0.6, y: 4.2, w: 5.5, h: 0.6, color: C.background2, valign: "middle" });
   card(s, 6.5, 1.5, 3.0, 2.3, C.background1, { transparency: 88 });
   text(s, "Thank you", { x: 6.5, y: 2.05, w: 3.0, h: 0.6, fontSize: 32, bold: true, color: C.background1, align: "center", valign: "middle" });
   text(s, "Questions are welcome", { x: 6.5, y: 2.75, w: 3.0, h: 0.4, color: C.background2, align: "center", valign: "middle" });
   cluster(s, 7.1, 4.45, C.accent2, 0.13, C.text2, 0.62);
   cluster(s, 8.0, 4.45, C.accent4, 0.13, C.text2, 0.62);
   cluster(s, 8.9, 4.45, C.accent3, 0.13, C.text2, 0.62);
-  s.addNotes("Close with the three points: the problem, the chosen solution and the outcome. Mention the next step, then invite questions.");
+  s.addNotes("Close with the three points: the problem, the chosen solution, and the test on real data. Point to the live demo and the Colab code, then invite questions.");
 }
 
 (async () => {

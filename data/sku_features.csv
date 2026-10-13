@@ -1,0 +1,384 @@
+sku,category,picks,season,volume,weight,cluster
+0152f69b,bed_bath_table,64,4.31,4.8,0.25,Regular small items
+027cdd14,perfumery,40,4.8,5.76,0.34,Regular small items
+036734b5,telephony,45,2.4,0.82,0.3,Regular small items
+044f05bc,telephony,32,3.38,0.82,0.3,Regular small items
+054515fd,sports_leisure,56,3.86,5.83,0.15,Regular small items
+05a9dadb,computers_accessories,33,4.36,8.0,2.95,Regular small items
+060c1756,computers_accessories,38,4.11,1.51,0.15,Regular small items
+06c6e011,computers_accessories,60,3.0,1.88,0.2,Regular small items
+06edb72f,bed_bath_table,143,1.68,3.8,0.35,Fast movers
+06f0e85c,stationery,30,3.2,34.2,9.85,Bulky / heavy
+07c05553,furniture_decor,30,3.2,1.8,0.6,Regular small items
+08574b07,garden_tools,113,2.12,19.66,9.0,Bulky / heavy
+08635182,bed_bath_table,32,3.75,35.1,3.31,Bulky / heavy
+08a58dc9,computers_accessories,37,2.27,1.55,0.4,Regular small items
+0a4093a4,health_beauty,44,2.45,1.2,0.3,Regular small items
+0a57f7d2,watches_gifts,104,2.19,2.77,0.4,Fast movers
+0aabfb37,consoles_games,142,2.37,2.3,0.15,Fast movers
+0bbdc963,sports_leisure,30,3.6,1.93,0.15,Regular small items
+0bcc3eec,garden_tools,115,2.09,32.56,1.8,Fast movers
+0cf41187,baby,35,2.74,4.1,0.3,Regular small items
+0d85c435,computers_accessories,72,5.17,2.91,0.15,Regular small items
+10717ff4,bed_bath_table,37,4.22,56.0,4.87,Bulky / heavy
+11875b30,sports_leisure,66,2.55,4.08,1.03,Regular small items
+11dcc970,housewares,34,5.65,25.26,1.04,Seasonal
+11fd9d7b,cool_stuff,49,2.69,2.3,10.22,Bulky / heavy
+130482ad,computers_accessories,49,2.45,24.0,2.8,Bulky / heavy
+154e7e31,health_beauty,281,1.37,4.5,0.1,Fast movers
+1600dcf1,watches_gifts,38,2.84,0.64,0.25,Regular small items
+1613b819,auto,68,2.82,2.55,0.05,Regular small items
+165f86fe,cool_stuff,109,3.19,16.53,2.42,Fast movers
+16679d68,health_beauty,35,3.77,5.13,0.08,Regular small items
+16ed6a6e,housewares,33,2.55,18.38,0.75,Regular small items
+173e9fe3,books_technical,43,9.21,1.83,0.95,Seasonal
+177d3d5b,stationery,42,2.86,34.8,7.55,Bulky / heavy
+186fe07c,watches_gifts,36,4.0,0.35,0.2,Regular small items
+18b0e642,computers_accessories,74,2.76,2.38,0.2,Regular small items
+19421075,sports_leisure,59,4.07,2.82,0.15,Regular small items
+19c91ef9,health_beauty,156,3.31,5.7,0.7,Fast movers
+1a080577,watches_gifts,32,2.62,3.95,0.42,Regular small items
+1bfb290d,office_furniture,46,2.09,91.52,10.07,Bulky / heavy
+1dec4c88,auto,35,5.83,55.22,17.6,Bulky / heavy
+1ec48688,fashion_bags_accessories,40,2.4,1.6,0.1,Regular small items
+2028bf1b,perfumery,138,2.09,3.36,0.25,Fast movers
+2136c70b,watches_gifts,89,1.89,0.35,0.2,Fast movers
+216bb0e0,construction_tools_lights,37,6.81,4.1,0.2,Seasonal
+22c5ddc2,perfumery,52,2.31,5.62,0.35,Regular small items
+23365bee,telephony,31,4.65,0.84,0.35,Regular small items
+24c66f10,health_beauty,65,3.51,4.26,0.79,Regular small items
+25c38557,baby,38,6.0,134.29,15.8,Bulky / heavy
+25e2023e,toys,33,5.82,13.2,0.89,Seasonal
+25f86162,bed_bath_table,62,2.32,52.49,10.8,Bulky / heavy
+283dc451,bed_bath_table,33,2.55,3.08,1.65,Regular small items
+29427de7,cool_stuff,97,2.23,32.74,4.47,Bulky / heavy
+2948658c,health_beauty,71,8.62,18.9,3.5,Seasonal
+2a2d22ae,bed_bath_table,70,3.6,51.3,8.35,Bulky / heavy
+2a5806f1,office_furniture,55,2.4,68.97,11.88,Bulky / heavy
+2b4609f8,health_beauty,260,1.25,3.96,0.25,Fast movers
+2b7aa376,office_furniture,33,3.64,71.06,13.39,Bulky / heavy
+2fea0f2c,health_beauty,58,7.45,1.33,0.1,Seasonal
+2ff995ae,furniture_living_room,42,6.29,30.87,7.5,Bulky / heavy
+2ffdf10e,watches_gifts,52,2.31,2.65,0.26,Regular small items
+30ac6df0,housewares,55,3.49,57.2,16.55,Bulky / heavy
+31a2f42a,toys,42,5.14,26.25,1.7,Bulky / heavy
+3225c54b,watches_gifts,37,2.92,2.43,0.27,Regular small items
+32e18e89,housewares,30,5.2,27.72,1.4,Seasonal
+3354a4e6,cool_stuff,72,4.5,15.75,1.2,Regular small items
+349ce46a,construction_tools_lights,42,4.86,4.86,1.3,Regular small items
+34d63063,computers_accessories,32,3.0,0.49,0.11,Regular small items
+35afc973,home_confort,165,2.18,21.2,1.82,Fast movers
+35ebf08a,electronics,45,2.67,3.24,0.15,Regular small items
+362b7732,sports_leisure,73,3.12,2.82,0.2,Regular small items
+363218ba,bed_bath_table,86,2.65,37.79,1.81,Bulky / heavy
+368c6c73,garden_tools,388,2.13,19.8,1.65,Fast movers
+36f60d45,computers_accessories,127,5.39,2.93,0.21,Fast movers
+380b4664,watches_gifts,36,2.0,0.35,0.25,Regular small items
+38648636,bed_bath_table,55,2.18,11.88,0.83,Regular small items
+389d119b,garden_tools,392,2.66,32.56,1.75,Fast movers
+3b0f7951,telephony,45,5.33,1.33,0.17,Regular small items
+3cb39171,auto,43,2.79,2.55,0.1,Regular small items
+3db75f31,computers_accessories,44,2.45,2.38,0.2,Regular small items
+3dd2a171,computers_accessories,274,3.02,4.84,0.53,Fast movers
+3e5201fe,bed_bath_table,44,3.0,4.5,1.8,Regular small items
+3eef0cb9,office_furniture,59,4.07,81.0,11.88,Bulky / heavy
+3f14d740,computers_accessories,91,3.3,3.46,0.32,Fast movers
+3fbc0ef7,health_beauty,150,3.04,2.96,0.35,Fast movers
+41c24b8c,watches_gifts,63,4.57,2.77,0.31,Regular small items
+41db6d80,telephony,36,4.0,1.04,0.12,Regular small items
+422879e1,garden_tools,484,2.26,19.8,1.55,Fast movers
+4298b7e6,computers_accessories,88,2.73,4.41,0.2,Fast movers
+42a2c92a,housewares,183,4.79,32.99,7.0,Bulky / heavy
+431d674f,telephony,53,3.85,0.56,0.45,Regular small items
+43423cdf,watches_gifts,93,2.19,2.46,0.35,Fast movers
+437c05a3,health_beauty,155,4.49,3.76,1.11,Fast movers
+4413a608,cool_stuff,51,2.82,10.24,2.35,Regular small items
+44a34214,sports_leisure,63,2.1,15.07,0.35,Regular small items
+44d097d5,fashion_bags_accessories,31,2.32,0.64,0.35,Regular small items
+44fded21,electronics,34,3.53,2.8,0.15,Regular small items
+4520766e,auto,53,3.62,4.35,0.05,Regular small items
+461f43be,watches_gifts,146,2.14,4.48,0.44,Fast movers
+473795a3,perfumery,88,3.95,8.0,0.1,Fast movers
+474bb6b5,electronics,37,3.24,6.0,0.15,Regular small items
+4aa6014e,housewares,47,2.81,53.4,10.15,Bulky / heavy
+4ae63444,telephony,52,4.85,0.86,0.28,Regular small items
+4b703444,bed_bath_table,30,5.2,3.81,0.26,Regular small items
+4b967866,housewares,49,2.45,58.62,10.75,Bulky / heavy
+4c2394ab,health_beauty,123,4.88,8.15,0.6,Fast movers
+4cc8bfa5,bed_bath_table,33,3.64,18.0,0.88,Regular small items
+4cd6ba4e,bed_bath_table,36,3.0,7.0,1.0,Regular small items
+4ce9ab52,computers_accessories,35,2.4,2.7,0.5,Regular small items
+4fcb3d9a,auto,89,2.02,46.48,5.95,Bulky / heavy
+4fe644d7,art,107,2.36,19.5,1.7,Fast movers
+50087061,telephony,32,5.25,0.94,0.22,Regular small items
+50fd2b78,electronics,40,4.5,6.0,0.15,Regular small items
+51f876eb,health_beauty,32,3.38,3.57,0.07,Regular small items
+52c80ced,garden_tools,118,1.53,8.0,7.65,Fast movers
+5328338c,cool_stuff,35,2.06,27.59,1.95,Bulky / heavy
+53759a2e,garden_tools,373,2.64,19.8,1.5,Fast movers
+53b36df6,watches_gifts,323,4.24,2.29,0.58,Fast movers
+53ea9da4,watches_gifts,39,3.69,2.34,0.35,Regular small items
+5411e926,stationery,77,5.61,31.92,6.55,Bulky / heavy
+54d9ac71,cool_stuff,114,8.0,7.78,1.87,Seasonal
+553e0e75,bed_bath_table,39,3.08,8.0,0.8,Regular small items
+55b71bf3,sports_leisure,34,2.82,23.1,3.4,Bulky / heavy
+566a4f2c,electronics,45,3.2,2.8,0.15,Regular small items
+569ffd16,furniture_decor,47,3.06,3.28,0.41,Regular small items
+57e089e3,baby,43,3.07,2.24,0.65,Regular small items
+57f2bc49,watches_gifts,38,4.11,0.64,0.25,Regular small items
+583f1585,sports_leisure,45,3.2,8.74,0.8,Regular small items
+593236d0,industry_commerce_and_business,37,3.24,41.2,7.22,Bulky / heavy
+595fac2a,perfumery,106,2.04,4.69,0.4,Fast movers
+5a6e53c3,housewares,73,3.78,2.05,0.2,Regular small items
+5a848e4a,unknown,197,2.92,3.6,0.4,Fast movers
+5b226d7c,bed_bath_table,49,2.2,18.0,0.88,Regular small items
+5b3b5f9a,toys,34,4.94,60.0,5.4,Bulky / heavy
+5bfc7506,bed_bath_table,31,1.94,23.62,0.8,Regular small items
+5d66715c,electronics,64,2.06,4.68,0.15,Regular small items
+5d6bea33,furniture_decor,44,4.64,31.5,4.0,Bulky / heavy
+5f504b3a,cool_stuff,63,2.67,88.36,15.35,Bulky / heavy
+601a360b,cool_stuff,119,1.82,15.75,1.6,Fast movers
+6109d0ca,luggage_accessories,37,2.92,16.66,1.25,Regular small items
+617186c3,perfumery,95,1.64,5.04,0.55,Fast movers
+629e019a,auto,74,2.59,27.0,1.75,Bulky / heavy
+62d8daee,bed_bath_table,46,2.61,4.8,0.35,Regular small items
+634256db,health_beauty,72,2.5,1.36,0.15,Regular small items
+63de2743,health_beauty,44,3.27,3.37,0.18,Regular small items
+64fb2654,bed_bath_table,75,2.24,20.94,1.82,Fast movers
+65266b2d,stationery,40,3.3,11.47,0.25,Regular small items
+656e0eca,computers_accessories,141,2.72,2.81,0.17,Fast movers
+657247f6,luggage_accessories,32,6.38,75.0,18.05,Bulky / heavy
+66a0a6e0,cool_stuff,32,2.62,60.0,1.5,Bulky / heavy
+67bd616e,health_beauty,37,3.24,5.83,0.3,Regular small items
+68030771,electronics,40,3.6,3.31,0.1,Regular small items
+69455f41,watches_gifts,41,4.39,3.28,0.5,Regular small items
+6a8631b7,electronics,62,1.94,1.12,0.1,Regular small items
+6adab229,pet_shop,32,3.38,11.76,1.25,Regular small items
+6bbe55cf,tablets_printing_image,33,4.36,5.54,0.28,Regular small items
+6c3effec,consoles_games,97,2.85,2.3,0.1,Fast movers
+6cc44821,bed_bath_table,35,2.4,14.44,1.05,Regular small items
+6cdd5384,health_beauty,156,1.54,11.4,0.9,Fast movers
+6f3b5b60,watches_gifts,117,3.08,2.99,0.34,Fast movers
+703d7428,bed_bath_table,50,4.32,9.45,0.95,Regular small items
+704ef63a,bed_bath_table,45,2.4,14.44,0.85,Regular small items
+719d5712,health_beauty,33,4.0,5.76,0.43,Regular small items
+72172e98,sports_leisure,49,2.2,3.64,0.2,Regular small items
+727a46f0,sports_leisure,42,3.43,6.86,0.2,Regular small items
+72d3bf1d,toys,33,4.0,8.4,0.58,Regular small items
+73326828,food,54,12.0,4.8,0.33,Seasonal
+7340a383,bed_bath_table,44,2.73,23.62,0.8,Regular small items
+73bcea88,watches_gifts,41,2.34,3.28,0.46,Regular small items
+7564c175,construction_tools_construction,44,4.09,1.94,1.2,Regular small items
+75d6b696,perfumery,93,2.32,3.96,0.4,Fast movers
+764292b2,furniture_decor,57,2.95,9.9,0.75,Regular small items
+76d1a1a9,unknown,32,3.75,1.23,0.55,Regular small items
+777d2e43,bed_bath_table,94,1.91,23.62,0.95,Fast movers
+77cc62dc,sports_leisure,30,3.2,12.79,1.62,Regular small items
+7814c273,furniture_decor,62,1.94,70.88,12.25,Bulky / heavy
+781afe92,sports_leisure,59,2.85,5.83,0.4,Regular small items
+78efe838,furniture_decor,101,1.66,12.0,2.5,Fast movers
+7a107816,watches_gifts,143,2.35,3.51,0.34,Fast movers
+7b85e3de,computers_accessories,34,4.24,3.24,1.58,Regular small items
+7c1bd920,health_beauty,231,1.4,3.96,0.2,Fast movers
+7c4a8bec,audio,40,3.3,0.7,0.17,Regular small items
+7ce94ab1,electronics,106,3.06,2.8,0.2,Fast movers
+7d509303,sports_leisure,41,6.15,45.0,1.65,Seasonal
+7d854ab9,cool_stuff,33,3.27,14.95,4.1,Bulky / heavy
+7e0dc102,garden_tools,72,7.5,9.0,0.8,Seasonal
+7f4e0342,baby,34,2.47,3.38,0.6,Regular small items
+7f72a890,toys,45,2.4,1.68,0.15,Regular small items
+7fab1a14,toys,48,3.25,15.0,0.6,Regular small items
+7fb04722,health_beauty,87,1.93,19.87,1.85,Fast movers
+810e2944,furniture_decor,34,3.88,31.5,2.2,Bulky / heavy
+81288df5,sports_leisure,33,5.09,31.5,3.77,Bulky / heavy
+817e1c2d,furniture_decor,32,1.88,40.0,2.75,Bulky / heavy
+827c4a77,furniture_decor,33,2.55,18.75,1.3,Regular small items
+82e4ad16,electronics,42,2.0,3.65,0.15,Regular small items
+8317b177,cool_stuff,46,2.61,3.02,0.4,Regular small items
+83b00325,baby,39,2.46,64.0,10.7,Bulky / heavy
+84f45695,bed_bath_table,111,2.38,20.94,1.55,Fast movers
+8562e2c7,bed_bath_table,46,3.13,12.6,1.1,Regular small items
+87283a98,fashion_bags_accessories,36,2.67,1.6,0.15,Regular small items
+87a71ae9,electronics,37,4.54,4.86,0.17,Regular small items
+880be32f,toys,99,2.3,1.23,0.2,Fast movers
+88dd6391,computers_accessories,50,6.72,3.14,0.22,Seasonal
+89321f94,food,119,2.42,2.87,0.15,Fast movers
+89b121be,computers_accessories,68,8.82,4.1,0.15,Seasonal
+8aa6223e,baby,48,2.5,16.0,5.0,Bulky / heavy
+8b50a72d,housewares,34,3.18,2.08,0.25,Regular small items
+8c292ca1,health_beauty,92,2.48,2.81,0.2,Fast movers
+8c5876b1,telephony,59,2.64,1.51,0.25,Regular small items
+8c591ab0,garden_tools,141,1.79,8.0,6.05,Fast movers
+8ed094bf,office_furniture,70,2.91,92.92,16.13,Bulky / heavy
+909b87db,computers_accessories,36,4.0,1.92,0.17,Regular small items
+91b08d34,telephony,31,4.26,0.7,0.1,Regular small items
+921d31a1,health_beauty,40,4.5,1.84,0.21,Regular small items
+928e52a9,housewares,60,4.6,24.0,1.6,Bulky / heavy
+93a12c28,computers_accessories,35,2.74,3.36,0.23,Regular small items
+93c902b0,electronics,71,2.7,4.68,1.25,Regular small items
+94475071,stationery,36,1.67,6.78,0.32,Regular small items
+952670bc,bed_bath_table,40,5.4,54.0,3.3,Bulky / heavy
+9545d45c,health_beauty,53,2.26,4.37,1.35,Regular small items
+962a6951,furniture_decor,46,4.43,31.5,2.55,Bulky / heavy
+97017430,telephony,69,2.09,0.82,0.3,Regular small items
+98a8c2fa,garden_tools,31,3.1,19.87,8.32,Bulky / heavy
+98d61056,auto,38,2.21,43.66,6.4,Bulky / heavy
+99a4788c,bed_bath_table,488,2.07,20.0,1.38,Fast movers
+99f26522,telephony,32,4.12,0.82,0.35,Regular small items
+9ad75bd7,bed_bath_table,43,5.02,19.95,1.23,Seasonal
+9bb8ca33,health_beauty,37,5.19,4.84,0.43,Regular small items
+9d8a0e11,sports_leisure,40,2.4,3.0,0.15,Regular small items
+9ecadb84,furniture_decor,97,4.21,14.0,0.95,Fast movers
+9fe172fa,fashion_bags_accessories,31,5.03,1.6,0.15,Regular small items
+a02d0123,construction_tools_lights,56,1.93,70.88,12.0,Bulky / heavy
+a0b7d5a9,furniture_decor,33,3.27,64.0,12.3,Bulky / heavy
+a19b6951,furniture_decor,60,2.4,14.0,0.65,Regular small items
+a237de12,furniture_decor,36,3.33,8.64,1.25,Regular small items
+a298a105,baby,40,4.2,9.0,0.4,Regular small items
+a35a9f46,computers_accessories,50,2.4,2.38,0.2,Regular small items
+a39cc58c,home_construction,35,3.09,31.5,3.8,Bulky / heavy
+a4aa7c14,pet_shop,42,1.71,40.0,2.2,Bulky / heavy
+a50acd33,auto,84,2.14,44.89,4.11,Bulky / heavy
+a5341e3f,furniture_decor,41,2.05,8.8,2.85,Regular small items
+a59fb60f,audio,45,2.4,2.7,0.2,Regular small items
+a5f6ba3f,electronics,32,3.0,5.17,0.14,Regular small items
+a62e25e0,watches_gifts,226,2.34,7.63,1.0,Fast movers
+a6ad77b1,furniture_decor,40,3.9,28.18,3.45,Bulky / heavy
+a8075470,garden_tools,34,2.12,6.23,2.9,Regular small items
+a8fe47ad,sports_leisure,34,3.53,14.0,0.4,Regular small items
+a92930c3,watches_gifts,160,3.15,0.64,0.25,Fast movers
+a9516a07,office_furniture,59,2.64,107.14,8.68,Bulky / heavy
+aa280035,toys,47,2.3,1.41,0.2,Regular small items
+aa8d88eb,watches_gifts,33,2.55,0.35,0.25,Regular small items
+aadff884,health_beauty,40,2.4,1.2,0.25,Regular small items
+ab1f9387,electronics,69,2.61,3.87,0.17,Regular small items
+ab9cf155,telephony,31,6.58,0.86,0.23,Seasonal
+aba86c09,office_furniture,57,2.95,70.2,2.6,Bulky / heavy
+abc3432f,telephony,31,2.71,2.21,0.15,Regular small items
+aca2eb7d,furniture_decor,527,2.78,15.0,2.6,Fast movers
+af2d506f,baby,38,4.42,3.38,0.6,Regular small items
+af51d485,luggage_accessories,55,3.05,125.5,22.35,Bulky / heavy
+afeeea62,telephony,53,3.17,0.56,0.45,Regular small items
+b0961721,garden_tools,127,3.21,32.56,1.85,Fast movers
+b0c8da30,computers_accessories,32,4.12,2.81,0.21,Regular small items
+b114bf33,office_furniture,54,3.11,70.22,13.35,Bulky / heavy
+b192be43,computers_accessories,35,4.8,4.8,0.72,Regular small items
+b1acb7e8,health_beauty,44,2.73,4.5,0.2,Regular small items
+b1d20758,unknown,48,8.0,0.7,0.35,Seasonal
+b38b25d8,health_beauty,32,2.62,1.08,0.2,Regular small items
+b532349f,furniture_decor,169,1.99,10.0,0.85,Fast movers
+b5e13c9a,toys,91,2.64,20.0,1.5,Fast movers
+b623b7cb,toys,66,5.09,46.08,3.01,Bulky / heavy
+b8a0d73b,health_beauty,34,4.94,5.12,0.37,Regular small items
+b8b42674,health_beauty,42,2.57,5.54,1.25,Regular small items
+b92a7304,office_furniture,30,1.6,46.85,9.72,Bulky / heavy
+b99e4f4f,electronics,30,2.8,2.38,1.05,Regular small items
+bb42f37f,bed_bath_table,48,2.25,0.6,0.4,Regular small items
+bb50f2e2,health_beauty,195,2.09,2.99,0.4,Fast movers
+bbaef2ea,perfumery,65,4.06,2.18,0.4,Regular small items
+bd6e6fce,bed_bath_table,69,2.43,18.0,0.85,Fast movers
+bdb4be6c,housewares,40,3.6,32.76,3.1,Bulky / heavy
+bdc3291a,electronics,46,4.43,3.65,0.54,Regular small items
+bdcf6a83,health_beauty,32,6.0,13.89,1.61,Seasonal
+be837f2e,home_appliances,36,3.33,4.12,0.95,Regular small items
+bee2e070,computers_accessories,80,4.35,8.0,0.17,Regular small items
+c1f5307d,telephony,48,2.75,0.82,0.3,Regular small items
+c20a3f59,housewares,41,4.39,3.46,0.57,Regular small items
+c211ff30,bed_bath_table,38,1.89,0.6,0.2,Regular small items
+c2ece641,furniture_decor,35,2.74,14.4,2.5,Bulky / heavy
+c3097e07,electronics,30,3.6,3.87,0.2,Regular small items
+c3ba4e8d,watches_gifts,58,2.48,0.64,0.35,Regular small items
+c403e106,bed_bath_table,30,2.4,6.0,0.55,Regular small items
+c4baedd8,garden_tools,149,2.26,8.0,5.95,Fast movers
+c5b72065,watches_gifts,30,6.8,2.11,0.42,Seasonal
+c6336fa9,sports_leisure,94,3.32,2.82,0.15,Fast movers
+c6dd917a,cool_stuff,120,2.2,15.75,1.2,Fast movers
+c6ea6336,bed_bath_table,44,3.27,12.6,2.9,Bulky / heavy
+c7b3cf9d,luggage_accessories,38,3.47,37.21,16.25,Bulky / heavy
+c7fd13b5,furniture_decor,52,3.46,12.0,1.35,Regular small items
+c857b965,furniture_decor,53,4.53,4.2,0.7,Regular small items
+c92f0e7b,luggage_accessories,36,2.67,68.62,17.55,Bulky / heavy
+c9c6fde7,telephony,79,5.01,1.9,0.15,Regular small items
+ca38c039,health_beauty,30,2.0,9.38,0.54,Regular small items
+ca5c9239,pet_shop,37,2.59,24.0,1.25,Regular small items
+cac9e569,baby,89,2.56,8.12,0.38,Fast movers
+cb81df0e,sports_leisure,35,3.77,4.32,0.23,Regular small items
+cc971e03,cool_stuff,46,2.61,15.75,2.4,Bulky / heavy
+ccadfeab,fashion_bags_accessories,32,4.5,1.0,0.1,Regular small items
+cd46a885,computers_accessories,30,12.0,33.7,3.48,Seasonal
+cd48f265,drinks,93,3.1,10.14,0.17,Fast movers
+ce6f7409,bed_bath_table,32,2.25,9.0,1.3,Regular small items
+cec09725,sports_leisure,71,2.37,2.42,2.5,Regular small items
+d017a215,fashion_bags_accessories,140,2.31,0.35,0.25,Fast movers
+d04857e7,computers_accessories,84,2.71,1.28,0.45,Regular small items
+d04bbac4,industry_commerce_and_business,41,3.51,56.7,11.32,Bulky / heavy
+d1c42706,computers_accessories,343,2.13,8.0,6.55,Fast movers
+d2085f7e,garden_tools,45,2.93,0.35,0.15,Regular small items
+d285360f,watches_gifts,123,4.39,3.04,0.36,Fast movers
+d2f5484c,computers_accessories,52,2.31,2.3,0.18,Regular small items
+d3c044bd,sports_leisure,72,3.33,2.82,0.15,Regular small items
+d5991653,computers_accessories,103,2.1,7.65,0.92,Fast movers
+d5b703c2,toys,44,2.18,2.24,0.15,Regular small items
+d6160fb7,computers,35,7.2,19.34,2.6,Seasonal
+d63c1011,health_beauty,55,2.18,17.5,0.95,Regular small items
+d696750e,housewares,57,1.47,3.44,0.95,Regular small items
+d6fe3b4d,office_furniture,31,5.42,87.7,16.65,Bulky / heavy
+dab2413e,telephony,68,2.82,1.55,0.25,Regular small items
+db5efde3,audio,48,2.5,2.43,6.66,Regular small items
+dbb4ce89,housewares,42,5.14,30.0,2.2,Bulky / heavy
+dbb67791,computers_accessories,88,4.5,2.65,0.21,Regular small items
+dc404a14,toys,39,6.46,33.63,1.58,Seasonal
+dc52f0f5,watches_gifts,39,1.85,0.64,0.4,Regular small items
+dd0dcee7,electronics,43,3.07,2.45,0.25,Regular small items
+dd6a505f,toys,36,2.33,1.23,0.2,Regular small items
+ddceb6ee,cool_stuff,52,3.69,25.16,4.65,Bulky / heavy
+dfb97c88,auto,35,2.4,90.99,5.42,Bulky / heavy
+e03102ef,stationery,53,2.72,22.73,0.75,Regular small items
+e0cf7976,health_beauty,137,1.93,1.2,0.25,Fast movers
+e0d64dcf,watches_gifts,194,2.29,2.86,4.34,Fast movers
+e1da6ab7,pet_shop,41,4.68,22.05,7.05,Bulky / heavy
+e251ebd2,garden_tools,48,2.75,24.08,8.88,Bulky / heavy
+e282624d,telephony,34,2.82,0.79,0.12,Regular small items
+e2e426d1,bed_bath_table,35,3.09,7.2,1.1,Regular small items
+e44f675b,sports_leisure,84,3.0,4.91,0.35,Fast movers
+e4d325bd,perfumery,33,2.55,4.61,0.53,Regular small items
+e53e557d,computers_accessories,183,4.66,2.21,0.18,Fast movers
+e59dd207,cool_stuff,62,2.71,2.3,0.12,Regular small items
+e5ae72c6,computers_accessories,38,3.16,3.24,0.16,Regular small items
+e5eadf9b,home_appliances,36,3.33,21.0,1.2,Regular small items
+e67307ff,health_beauty,41,2.93,7.83,0.15,Regular small items
+e7cc48a9,telephony,93,8.77,10.08,0.7,Seasonal
+e8316a46,office_furniture,30,5.2,46.85,9.2,Bulky / heavy
+e9a69340,housewares,58,3.72,13.46,3.0,Bulky / heavy
+e9def91e,toys,45,3.73,4.18,0.5,Regular small items
+ea44caac,baby,63,2.48,39.38,6.6,Bulky / heavy
+eb8c629f,furniture_decor,95,2.4,12.0,1.4,Fast movers
+ec2d43cc,bed_bath_table,131,2.93,8.0,0.8,Fast movers
+ecbe1ef7,sports_leisure,34,5.65,6.38,0.9,Seasonal
+ed2067a9,food,55,1.96,2.88,0.75,Regular small items
+ee0c1cf2,perfumery,89,2.16,3.33,0.2,Fast movers
+ee3d532c,computers_accessories,32,9.0,5.13,0.36,Seasonal
+ee406bf2,cool_stuff,90,2.53,19.01,1.05,Fast movers
+f1c7f353,bed_bath_table,154,4.6,12.6,9.75,Bulky / heavy
+f1fe595e,garden_tools,48,3.75,6.85,1.9,Regular small items
+f264c1d9,cool_stuff,50,2.4,15.75,1.05,Regular small items
+f2e53dd1,bed_bath_table,32,3.38,16.52,1.98,Bulky / heavy
+f3592795,books_general_interest,58,3.52,8.0,0.45,Regular small items
+f40876e0,health_beauty,55,1.96,3.57,0.43,Regular small items
+f4f67cca,auto,56,2.36,52.09,7.62,Bulky / heavy
+f646af31,furniture_decor,35,3.09,4.91,0.6,Regular small items
+f71973c9,luggage_accessories,65,2.77,100.1,16.1,Bulky / heavy
+f71f42e2,computers_accessories,56,3.43,2.38,0.25,Regular small items
+f731f858,perfumery,30,2.8,3.93,0.38,Regular small items
+f7a17d2c,housewares,63,3.43,3.34,0.35,Regular small items
+f7f59e61,housewares,39,2.15,32.38,3.7,Bulky / heavy
+f819f0c8,watches_gifts,45,2.67,3.46,0.71,Regular small items
+f8b624d4,housewares,42,4.29,23.92,2.84,Bulky / heavy
+fb55982b,stationery,84,4.43,36.0,7.0,Bulky / heavy
+fb7a100e,toys,36,3.33,4.1,0.15,Regular small items
+fbc1488c,perfumery,58,3.1,4.2,0.56,Regular small items
+fbce4c4c,bed_bath_table,60,5.8,27.0,6.55,Bulky / heavy
+fc1d8637,bed_bath_table,57,2.74,7.62,1.7,Regular small items
+fe01b643,perfumery,46,6.0,10.92,1.25,Seasonal
+fe077ec8,computers_accessories,33,3.27,3.6,0.2,Regular small items
+fe6a9515,cool_stuff,40,4.5,106.58,5.65,Bulky / heavy

@@ -137,11 +137,25 @@
     <p class="lead">Group similar products with K-Means, then give each group a storage zone.</p>
     <div class="links">
       <a class="btn primary" href="#demo">Try the demo</a>
+      <a class="btn" href="#real">Real data results</a>
       <a class="btn" href="slides/kmeans-sku-clustering.pptx" download>Slides (PPTX)</a>
       <a class="btn" href="script/presentation-script.pdf">Presentation script (PDF)</a>
       <a class="btn" href="https://github.com/ZANYANBU/warehouse-sku-kmeans">Source on GitHub</a>
     </div>
   </header>
+
+  <section id="real" class="card" aria-labelledby="real-h">
+    <h2 id="real-h">Tested on real data</h2>
+    <p class="sub" id="real-sub">383 products from 99,441 real orders (Olist, 2016 to 2018). K-Means found 4 groups.</p>
+    <div class="links" style="margin-top:0">
+      <a class="btn primary" href="https://colab.research.google.com/github/ZANYANBU/warehouse-sku-kmeans/blob/main/notebook/warehouse_sku_kmeans.ipynb">Run the code in Google Colab</a>
+      <a class="btn" href="https://github.com/olist/work-at-olist-data">Live dataset</a>
+      <a class="btn" href="data/sku_features.csv" download>SKU table (CSV)</a>
+    </div>
+    <div class="tiles" id="real-tiles" style="margin-top:14px"></div>
+    <div class="scroll" style="margin-top:12px"><table id="real-table"></table></div>
+    <p class="note">Orders, sizes and weights are real. Walk per pick is a simple model.</p>
+  </section>
 
   <section id="demo" class="card" aria-labelledby="demo-h">
     <h2 id="demo-h">Run K-Means yourself</h2>
@@ -254,7 +268,8 @@
     <details>
       <summary>About the numbers</summary>
       <ul class="about">
-        <li>The data is made up in your browser. No real warehouse data is used, and product names and pictures are examples.</li>
+        <li>The real-data results use Olist's public e-commerce dataset (MIT licence): the 383 products ordered at least 30 times. It has no handling field, so weight stands in for handling needs.</li>
+        <li>The demo below it uses example data made up in your browser. Its product names and pictures are examples.</li>
         <li>Clusters use all four numbers: picks per week, season index, volume and a fragile flag. The picture shows two at a time.</li>
         <li>Error is the within-cluster variance on scaled data, the best of 10 runs for each k.</li>
         <li>The first start for each k is picked to show the steps clearly. New starting centres is a plain random start, and can get stuck in a worse grouping.</li>
@@ -265,7 +280,7 @@
   </section>
 
   <footer>
-    <p>Student project, Machine Learning (21CSC305P), Unit 3. The numbers show the method, not a real warehouse.</p>
+    <p>Student project, Machine Learning (21CSC305P), Unit 3. Real data: Brazilian E-Commerce Public Dataset by Olist.</p>
   </footer>
 </div>
 
@@ -814,6 +829,24 @@
   $("run").addEventListener("click", toggleRun);
   $("reset").addEventListener("click", () => { S.initSeed = 100 + (++S.tries); restart(); });
   $("newdata").addEventListener("click", () => { S.seed++; newData(); });
+  // The run on real data is done by the notebook; the page shows its result.
+  fetch("data/results.json").then((r) => r.json()).then((res) => {
+    $("real-sub").textContent = `${fmt(res.skus)} products from ${fmt(res.orders)} real orders (Olist, ${res.period[0].slice(0, 4)} to ${res.period[1].slice(0, 4)}). K-Means found ${res.k} groups.`;
+    const tiles = $("real-tiles");
+    [[`${fmt(res.walk_no_grouping_m, 1)} m`, "No grouping"], [`${fmt(res.walk_kmeans_m, 1)} m`, "K-Means zones"], [`${fmt(res.walk_saving_pct)}%`, "Less walking"]]
+      .forEach(([v, l]) => { const t = h("div", "tile", null, tiles); h("div", "v", v, t); h("div", "l", l, t); });
+    const table = $("real-table"), head = h("tr", "", null, h("thead", "", null, table));
+    [["Zone", ""], ["Cluster", ""], ["SKUs", "num"], ["Avg orders", "num"], ["Season index", "num"], ["Avg volume (L)", "num"], ["Avg weight (kg)", "num"], ["Place in the aisle", ""]]
+      .forEach(([t, c]) => { h("th", c, t, head).scope = "col"; });
+    const body = h("tbody", "", null, table);
+    res.clusters.forEach((m) => {
+      const tr = h("tr", "", null, body);
+      h("td", "", m.zone, tr); h("td", "", m.name, tr).style.fontWeight = "600";
+      h("td", "num", fmt(m.n), tr); h("td", "num", fmt(m.picks), tr); h("td", "num", fmt(m.season, 1), tr);
+      h("td", "num", fmt(m.volume, 1), tr); h("td", "num", fmt(m.weight, 1), tr); h("td", "", `${fmt(m.from_m)} to ${fmt(m.to_m)} m`, tr);
+    });
+  }).catch(() => { $("real-sub").textContent = "The real-data results could not be loaded."; });
+
   newData();
   window.__kmeansDemo = S; // for checking the page from the console
 })();

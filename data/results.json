@@ -1,0 +1,73 @@
+{
+ "source": "https://github.com/olist/work-at-olist-data",
+ "orders": 99441,
+ "order_lines": 112650,
+ "products": 32951,
+ "skus": 383,
+ "period": [
+  "2016-09-04",
+  "2018-10-17"
+ ],
+ "elbow": [
+  1532.0,
+  1025.2,
+  772.5,
+  600.1,
+  511.0,
+  453.9,
+  410.9,
+  368.2
+ ],
+ "k": 4,
+ "error": 600.1,
+ "clusters": [
+  {
+   "n": 76,
+   "picks": 159.84,
+   "season": 2.59,
+   "volume": 9.18,
+   "weight": 1.13,
+   "name": "Fast movers",
+   "zone": "A",
+   "from_m": 0.0,
+   "to_m": 25.3
+  },
+  {
+   "n": 84,
+   "picks": 51.56,
+   "season": 3.46,
+   "volume": 47.13,
+   "weight": 7.57,
+   "name": "Bulky / heavy",
+   "zone": "B",
+   "from_m": 25.3,
+   "to_m": 53.3
+  },
+  {
+   "n": 25,
+   "picks": 47.92,
+   "season": 7.42,
+   "volume": 12.91,
+   "weight": 1.11,
+   "name": "Seasonal",
+   "zone": "C",
+   "from_m": 53.3,
+   "to_m": 61.7
+  },
+  {
+   "n": 198,
+   "picks": 44.97,
+   "season": 3.18,
+   "volume": 5.13,
+   "weight": 0.57,
+   "name": "Regular small items",
+   "zone": "D",
+   "from_m": 61.7,
+   "to_m": 127.7
+  }
+ ],
+ "aisle_m": 127.7,
+ "walk_no_grouping_m": 63.8,
+ "walk_kmeans_m": 46.5,
+ "walk_saving_pct": 27
+}
