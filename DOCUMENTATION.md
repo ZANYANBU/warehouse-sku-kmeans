@@ -11,6 +11,15 @@ Machine Learning (21CSC305P), Project Review 3, Team Cash guard
 | Presentation script | [PDF](script/presentation-script.pdf) |
 | Dataset | [Olist on GitHub](https://github.com/olist/work-at-olist-data/tree/master/datasets) |
 
+## Team and contributions
+
+| Member | Part of the project | What it covers |
+|---|---|---|
+| S Roopesh | Problem study and choice of solution | The problem statement, the key terms, the review of the Unit 3 solutions and the case for K-Means (slides 1 to 5) |
+| B. Charith Reddy | Method and data preparation | Why not the other methods, how K-Means works, the real dataset and its four numbers, and choosing k with the elbow method (slides 6 to 10) |
+| Y Rupesh Reddy | Clustering results and graphs | The silhouette check, reading and naming the four clusters, and the cluster graphs (slides 11 to 15) |
+| V. Anbu Chelvan | Warehouse solution, demo and delivery | Turning clusters into zones, the walking model, the live demo website, the Colab notebook, this repository and the conclusion (slides 16 to 18) |
+
 ## 1. The problem
 
 A warehouse stores thousands of products. Each product type is called an SKU. When products are kept wherever there is space, workers walk a long way to collect each order.
